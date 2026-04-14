@@ -1,0 +1,1220 @@
+<!doctype html>
+<html lang="en" class="h-full">
+ <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Multi-Store Milk Dairy Management System</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="/_sdk/element_sdk.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+  <style>
+    body {
+      box-sizing: border-box;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+    }
+    
+    .sidebar-item {
+      transition: all 0.2s ease;
+    }
+    
+    .sidebar-item:hover {
+      background: rgba(34, 197, 94, 0.1);
+    }
+    
+    .sidebar-item.active {
+      background: linear-gradient(90deg, rgba(34, 197, 94, 0.15) 0%, transparent 100%);
+      border-left: 3px solid #22c55e;
+    }
+    
+    .card {
+      background: white;
+      border-radius: 16px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.08), 0 4px 12px rgba(0,0,0,0.04);
+      transition: all 0.3s ease;
+    }
+    
+    .card:hover {
+      box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+    }
+    
+    .stat-card {
+      background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+    }
+    
+    .chart-bar {
+      animation: growUp 0.8s ease-out forwards;
+      transform-origin: bottom;
+    }
+    
+    @keyframes growUp {
+      from { transform: scaleY(0); }
+      to { transform: scaleY(1); }
+    }
+    
+    .pulse-dot {
+      animation: pulse 2s infinite;
+    }
+    
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+    
+    .table-row:hover {
+      background: #f0fdf4;
+    }
+    
+    .scrollbar-thin::-webkit-scrollbar {
+      width: 6px;
+    }
+    
+    .scrollbar-thin::-webkit-scrollbar-track {
+      background: #f1f5f9;
+      border-radius: 3px;
+    }
+    
+    .scrollbar-thin::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+      border-radius: 3px;
+    }
+    
+    .scrollbar-thin::-webkit-scrollbar-thumb:hover {
+      background: #94a3b8;
+    }
+  </style>
+  <style>@view-transition { navigation: auto; }</style>
+  <script src="/_sdk/data_sdk.js" type="text/javascript"></script>
+ </head>
+ <body class="h-full bg-slate-50">
+  <div class="flex h-full"><!-- Sidebar -->
+   <aside class="w-64 bg-white border-r border-slate-200 flex flex-col" style="min-height: 100%;"><!-- Logo -->
+    <div class="p-5 border-b border-slate-100">
+     <div class="flex items-center gap-3">
+      <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-green-500 to-emerald-600 flex items-center justify-center">
+       <svg class="w-6 h-6 text-white" fill="currentColor" viewbox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" />
+       </svg>
+      </div>
+      <div>
+       <h1 id="company-name" class="font-bold text-slate-800 text-sm">DairyPro Enterprise</h1>
+       <p class="text-xs text-slate-500">Management System</p>
+      </div>
+     </div>
+    </div><!-- Navigation -->
+    <nav class="flex-1 py-4 overflow-y-auto scrollbar-thin">
+     <div class="px-3 mb-2"><span class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Main Menu</span>
+     </div><button onclick="showScreen('dashboard')" id="nav-dashboard" class="sidebar-item active w-full flex items-center gap-3 px-4 py-3 text-slate-700 text-sm font-medium">
+      <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
+      </svg> Dashboard </button> <button onclick="showScreen('centers')" id="nav-centers" class="sidebar-item w-full flex items-center gap-3 px-4 py-3 text-slate-700 text-sm font-medium">
+      <svg class="w-5 h-5 text-slate-500" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+      </svg> Collection Centers </button> <button onclick="showScreen('ratechart')" id="nav-ratechart" class="sidebar-item w-full flex items-center gap-3 px-4 py-3 text-slate-700 text-sm font-medium">
+      <svg class="w-5 h-5 text-slate-500" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+      </svg> Rate Chart </button> <button onclick="showScreen('audit')" id="nav-audit" class="sidebar-item w-full flex items-center gap-3 px-4 py-3 text-slate-700 text-sm font-medium">
+      <svg class="w-5 h-5 text-slate-500" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
+      </svg> Audit Log </button> <button onclick="showScreen('quality')" id="nav-quality" class="sidebar-item w-full flex items-center gap-3 px-4 py-3 text-slate-700 text-sm font-medium">
+      <svg class="w-5 h-5 text-slate-500" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+      </svg> Quality Control </button> <button onclick="showScreen('reports')" id="nav-reports" class="sidebar-item w-full flex items-center gap-3 px-4 py-3 text-slate-700 text-sm font-medium">
+      <svg class="w-5 h-5 text-slate-500" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+      </svg> Reports &amp; Analytics </button>
+     <div class="px-3 mt-6 mb-2"><span class="text-xs font-semibold text-slate-400 uppercase tracking-wider">System</span>
+     </div><button onclick="showScreen('settings')" id="nav-settings" class="sidebar-item w-full flex items-center gap-3 px-4 py-3 text-slate-700 text-sm font-medium">
+      <svg class="w-5 h-5 text-slate-500" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" /> <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+      </svg> Settings </button>
+    </nav><!-- User Profile -->
+    <div class="p-4 border-t border-slate-100">
+     <div class="flex items-center gap-3">
+      <div class="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center text-white font-semibold text-sm">
+       RS
+      </div>
+      <div class="flex-1 min-w-0">
+       <p class="text-sm font-semibold text-slate-800 truncate">Rajesh Sharma</p>
+       <p class="text-xs text-slate-500">Super Admin</p>
+      </div><button class="p-2 hover:bg-slate-100 rounded-lg transition">
+       <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+       </svg></button>
+     </div>
+    </div>
+   </aside><!-- Main Content -->
+   <main class="flex-1 overflow-y-auto scrollbar-thin"><!-- Dashboard Screen -->
+    <div id="screen-dashboard" class="screen p-6"><!-- Header -->
+     <div class="flex items-center justify-between mb-6">
+      <div>
+       <h2 id="dashboard-title" class="text-2xl font-bold text-slate-800">Owner Dashboard</h2>
+       <p class="text-slate-500 text-sm mt-1">Welcome back! Here's your dairy overview for today.</p>
+      </div>
+      <div class="flex items-center gap-3"><select class="px-4 py-2 bg-white border border-slate-200 rounded-xl text-sm text-slate-600 focus:outline-none focus:ring-2 focus:ring-green-500"> <option>All Centers</option> <option>Anand Dairy Center</option> <option>Kheda Collection Point</option> <option>Mehsana Milk Hub</option> </select> <select class="px-4 py-2 bg-white border border-slate-200 rounded-xl text-sm text-slate-600 focus:outline-none focus:ring-2 focus:ring-green-500"> <option>Morning Shift</option> <option>Evening Shift</option> <option>Both Shifts</option> </select> <input type="date" value="2024-01-15" class="px-4 py-2 bg-white border border-slate-200 rounded-xl text-sm text-slate-600 focus:outline-none focus:ring-2 focus:ring-green-500">
+      </div>
+     </div><!-- Stats Cards -->
+     <div class="grid grid-cols-4 gap-5 mb-6">
+      <div class="card stat-card p-5">
+       <div class="flex items-start justify-between">
+        <div>
+         <p class="text-xs font-semibold text-slate-500 uppercase tracking-wide">Total Milk Today</p>
+         <p class="text-3xl font-bold text-slate-800 mt-2">24,580</p>
+         <p class="text-sm text-slate-500 mt-1">Liters</p>
+        </div>
+        <div class="w-12 h-12 rounded-xl bg-green-100 flex items-center justify-center">
+         <svg class="w-6 h-6 text-green-600" fill="currentColor" viewbox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" />
+         </svg>
+        </div>
+       </div>
+       <div class="flex items-center gap-1 mt-3"><span class="text-xs font-semibold text-green-600 bg-green-50 px-2 py-1 rounded-full">↑ 12.5%</span> <span class="text-xs text-slate-500">vs yesterday</span>
+       </div>
+      </div>
+      <div class="card stat-card p-5">
+       <div class="flex items-start justify-between">
+        <div>
+         <p class="text-xs font-semibold text-slate-500 uppercase tracking-wide">Average FAT</p>
+         <p class="text-3xl font-bold text-slate-800 mt-2">4.2%</p>
+         <p class="text-sm text-slate-500 mt-1">All Centers</p>
+        </div>
+        <div class="w-12 h-12 rounded-xl bg-blue-100 flex items-center justify-center">
+         <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+         </svg>
+        </div>
+       </div>
+       <div class="flex items-center gap-1 mt-3"><span class="text-xs font-semibold text-blue-600 bg-blue-50 px-2 py-1 rounded-full">↑ 0.3%</span> <span class="text-xs text-slate-500">vs last week</span>
+       </div>
+      </div>
+      <div class="card stat-card p-5">
+       <div class="flex items-start justify-between">
+        <div>
+         <p class="text-xs font-semibold text-slate-500 uppercase tracking-wide">Average SNF</p>
+         <p class="text-3xl font-bold text-slate-800 mt-2">8.6%</p>
+         <p class="text-sm text-slate-500 mt-1">All Centers</p>
+        </div>
+        <div class="w-12 h-12 rounded-xl bg-purple-100 flex items-center justify-center">
+         <svg class="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+         </svg>
+        </div>
+       </div>
+       <div class="flex items-center gap-1 mt-3"><span class="text-xs font-semibold text-green-600 bg-green-50 px-2 py-1 rounded-full">↑ 0.1%</span> <span class="text-xs text-slate-500">vs last week</span>
+       </div>
+      </div>
+      <div class="card stat-card p-5">
+       <div class="flex items-start justify-between">
+        <div>
+         <p class="text-xs font-semibold text-slate-500 uppercase tracking-wide">Quality Alerts</p>
+         <p class="text-3xl font-bold text-red-600 mt-2">3</p>
+         <p class="text-sm text-slate-500 mt-1">Requires Review</p>
+        </div>
+        <div class="w-12 h-12 rounded-xl bg-red-100 flex items-center justify-center">
+         <div class="pulse-dot">
+          <svg class="w-6 h-6 text-red-600" fill="currentColor" viewbox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z" />
+          </svg>
+         </div>
+        </div>
+       </div>
+       <div class="flex items-center gap-1 mt-3"><span class="text-xs font-semibold text-red-600 bg-red-50 px-2 py-1 rounded-full">⚠ Action Needed</span>
+       </div>
+      </div>
+     </div><!-- Charts Row -->
+     <div class="grid grid-cols-3 gap-5 mb-6"><!-- Milk Collection Chart -->
+      <div class="card p-5 col-span-2">
+       <div class="flex items-center justify-between mb-5">
+        <h3 class="font-semibold text-slate-800">Center-wise Milk Collection</h3>
+        <div class="flex items-center gap-2"><span class="flex items-center gap-1 text-xs text-slate-500"> <span class="w-3 h-3 rounded-full bg-green-500"></span> Morning </span> <span class="flex items-center gap-1 text-xs text-slate-500"> <span class="w-3 h-3 rounded-full bg-blue-500"></span> Evening </span>
+        </div>
+       </div>
+       <div class="flex items-end justify-between h-48 px-2">
+        <div class="flex flex-col items-center gap-2 flex-1">
+         <div class="flex gap-1 items-end h-40">
+          <div class="chart-bar w-8 bg-gradient-to-t from-green-600 to-green-400 rounded-t-lg" style="height: 85%;"></div>
+          <div class="chart-bar w-8 bg-gradient-to-t from-blue-600 to-blue-400 rounded-t-lg" style="height: 70%;"></div>
+         </div><span class="text-xs text-slate-600 font-medium">Anand</span>
+        </div>
+        <div class="flex flex-col items-center gap-2 flex-1">
+         <div class="flex gap-1 items-end h-40">
+          <div class="chart-bar w-8 bg-gradient-to-t from-green-600 to-green-400 rounded-t-lg" style="height: 65%;"></div>
+          <div class="chart-bar w-8 bg-gradient-to-t from-blue-600 to-blue-400 rounded-t-lg" style="height: 55%;"></div>
+         </div><span class="text-xs text-slate-600 font-medium">Kheda</span>
+        </div>
+        <div class="flex flex-col items-center gap-2 flex-1">
+         <div class="flex gap-1 items-end h-40">
+          <div class="chart-bar w-8 bg-gradient-to-t from-green-600 to-green-400 rounded-t-lg" style="height: 90%;"></div>
+          <div class="chart-bar w-8 bg-gradient-to-t from-blue-600 to-blue-400 rounded-t-lg" style="height: 80%;"></div>
+         </div><span class="text-xs text-slate-600 font-medium">Mehsana</span>
+        </div>
+        <div class="flex flex-col items-center gap-2 flex-1">
+         <div class="flex gap-1 items-end h-40">
+          <div class="chart-bar w-8 bg-gradient-to-t from-green-600 to-green-400 rounded-t-lg" style="height: 55%;"></div>
+          <div class="chart-bar w-8 bg-gradient-to-t from-blue-600 to-blue-400 rounded-t-lg" style="height: 45%;"></div>
+         </div><span class="text-xs text-slate-600 font-medium">Nadiad</span>
+        </div>
+        <div class="flex flex-col items-center gap-2 flex-1">
+         <div class="flex gap-1 items-end h-40">
+          <div class="chart-bar w-8 bg-gradient-to-t from-green-600 to-green-400 rounded-t-lg" style="height: 75%;"></div>
+          <div class="chart-bar w-8 bg-gradient-to-t from-blue-600 to-blue-400 rounded-t-lg" style="height: 60%;"></div>
+         </div><span class="text-xs text-slate-600 font-medium">Vallabh</span>
+        </div>
+       </div>
+      </div><!-- FAT/SNF Trend -->
+      <div class="card p-5">
+       <h3 class="font-semibold text-slate-800 mb-5">FAT &amp; SNF Trends (7 Days)</h3>
+       <div class="relative h-48">
+        <svg class="w-full h-full" viewbox="0 0 200 100"><!-- Grid lines --> <line x1="0" y1="25" x2="200" y2="25" stroke="#e2e8f0" stroke-width="1" /> <line x1="0" y1="50" x2="200" y2="50" stroke="#e2e8f0" stroke-width="1" /> <line x1="0" y1="75" x2="200" y2="75" stroke="#e2e8f0" stroke-width="1" /> <!-- FAT Line (Green) --> <polyline fill="none" stroke="#22c55e" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" points="10,60 40,55 70,58 100,50 130,48 160,45 190,42" /> <circle cx="190" cy="42" r="4" fill="#22c55e" /> <!-- SNF Line (Blue) --> <polyline fill="none" stroke="#3b82f6" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" points="10,35 40,38 70,32 100,30 130,28 160,25 190,22" /> <circle cx="190" cy="22" r="4" fill="#3b82f6" />
+        </svg>
+       </div>
+       <div class="flex items-center justify-center gap-6 mt-2"><span class="flex items-center gap-2 text-sm text-slate-600"> <span class="w-3 h-3 rounded-full bg-green-500"></span> FAT % </span> <span class="flex items-center gap-2 text-sm text-slate-600"> <span class="w-3 h-3 rounded-full bg-blue-500"></span> SNF % </span>
+       </div>
+      </div>
+     </div><!-- Quality Alerts Table -->
+     <div class="card p-5">
+      <div class="flex items-center justify-between mb-5">
+       <h3 class="font-semibold text-slate-800">Quality Alerts - Possible Adulteration</h3><button class="px-4 py-2 text-sm font-medium text-green-600 hover:bg-green-50 rounded-lg transition"> View All Alerts → </button>
+      </div>
+      <table class="w-full">
+       <thead>
+        <tr class="border-b border-slate-100">
+         <th class="text-left py-3 px-4 text-xs font-semibold text-slate-500 uppercase">Center</th>
+         <th class="text-left py-3 px-4 text-xs font-semibold text-slate-500 uppercase">Farmer ID</th>
+         <th class="text-left py-3 px-4 text-xs font-semibold text-slate-500 uppercase">FAT</th>
+         <th class="text-left py-3 px-4 text-xs font-semibold text-slate-500 uppercase">SNF</th>
+         <th class="text-left py-3 px-4 text-xs font-semibold text-slate-500 uppercase">Issue</th>
+         <th class="text-left py-3 px-4 text-xs font-semibold text-slate-500 uppercase">Status</th>
+         <th class="text-left py-3 px-4 text-xs font-semibold text-slate-500 uppercase">Action</th>
+        </tr>
+       </thead>
+       <tbody>
+        <tr class="table-row border-b border-slate-50 transition">
+         <td class="py-3 px-4 text-sm text-slate-700 font-medium">Anand Dairy</td>
+         <td class="py-3 px-4 text-sm text-slate-600">FRM-1045</td>
+         <td class="py-3 px-4 text-sm text-red-600 font-semibold">2.8%</td>
+         <td class="py-3 px-4 text-sm text-red-600 font-semibold">7.2%</td>
+         <td class="py-3 px-4"><span class="px-2 py-1 text-xs font-medium bg-red-100 text-red-700 rounded-full">Water Suspected</span></td>
+         <td class="py-3 px-4"><span class="px-2 py-1 text-xs font-medium bg-amber-100 text-amber-700 rounded-full">Pending</span></td>
+         <td class="py-3 px-4"><button class="px-3 py-1.5 text-xs font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition"> Review </button></td>
+        </tr>
+        <tr class="table-row border-b border-slate-50 transition">
+         <td class="py-3 px-4 text-sm text-slate-700 font-medium">Kheda Point</td>
+         <td class="py-3 px-4 text-sm text-slate-600">FRM-0892</td>
+         <td class="py-3 px-4 text-sm text-red-600 font-semibold">3.1%</td>
+         <td class="py-3 px-4 text-sm text-red-600 font-semibold">7.5%</td>
+         <td class="py-3 px-4"><span class="px-2 py-1 text-xs font-medium bg-amber-100 text-amber-700 rounded-full">Low Quality</span></td>
+         <td class="py-3 px-4"><span class="px-2 py-1 text-xs font-medium bg-amber-100 text-amber-700 rounded-full">Pending</span></td>
+         <td class="py-3 px-4"><button class="px-3 py-1.5 text-xs font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition"> Review </button></td>
+        </tr>
+        <tr class="table-row transition">
+         <td class="py-3 px-4 text-sm text-slate-700 font-medium">Mehsana Hub</td>
+         <td class="py-3 px-4 text-sm text-slate-600">FRM-1203</td>
+         <td class="py-3 px-4 text-sm text-red-600 font-semibold">2.5%</td>
+         <td class="py-3 px-4 text-sm text-red-600 font-semibold">6.9%</td>
+         <td class="py-3 px-4"><span class="px-2 py-1 text-xs font-medium bg-red-100 text-red-700 rounded-full">Water Suspected</span></td>
+         <td class="py-3 px-4"><span class="px-2 py-1 text-xs font-medium bg-amber-100 text-amber-700 rounded-full">Pending</span></td>
+         <td class="py-3 px-4"><button class="px-3 py-1.5 text-xs font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition"> Review </button></td>
+        </tr>
+       </tbody>
+      </table>
+     </div>
+    </div><!-- Collection Centers Screen -->
+    <div id="screen-centers" class="screen hidden p-6">
+     <div class="flex items-center justify-between mb-6">
+      <div>
+       <h2 class="text-2xl font-bold text-slate-800">Collection Centers</h2>
+       <p class="text-slate-500 text-sm mt-1">Manage and monitor all your dairy collection points</p>
+      </div><button class="px-5 py-2.5 bg-gradient-to-r from-green-600 to-emerald-600 text-white font-semibold rounded-xl shadow-lg shadow-green-200 hover:shadow-green-300 transition flex items-center gap-2">
+       <svg class="w-5 h-5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+       </svg> Add New Center </button>
+     </div><!-- Centers Grid -->
+     <div class="grid grid-cols-2 gap-5">
+      <div class="card p-5">
+       <div class="flex items-start justify-between mb-4">
+        <div class="flex items-center gap-3">
+         <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-green-500 to-emerald-600 flex items-center justify-center text-white font-bold text-lg">
+          A
+         </div>
+         <div>
+          <h3 class="font-bold text-slate-800">Anand Dairy Center</h3>
+          <p class="text-sm text-slate-500">Anand, Gujarat</p>
+         </div>
+        </div><span class="px-3 py-1 text-xs font-semibold bg-green-100 text-green-700 rounded-full">Active</span>
+       </div>
+       <div class="grid grid-cols-3 gap-4 mb-4">
+        <div class="bg-slate-50 rounded-xl p-3">
+         <p class="text-xs text-slate-500 mb-1">Total Milk</p>
+         <p class="text-xl font-bold text-slate-800">5,240 L</p>
+        </div>
+        <div class="bg-slate-50 rounded-xl p-3">
+         <p class="text-xs text-slate-500 mb-1">Avg FAT</p>
+         <p class="text-xl font-bold text-green-600">4.3%</p>
+        </div>
+        <div class="bg-slate-50 rounded-xl p-3">
+         <p class="text-xs text-slate-500 mb-1">Avg SNF</p>
+         <p class="text-xl font-bold text-blue-600">8.7%</p>
+        </div>
+       </div>
+       <div class="border-t border-slate-100 pt-4">
+        <div class="flex items-center justify-between mb-2"><span class="text-sm text-slate-600">Tank FAT vs Farmer Avg</span> <span class="text-sm font-semibold text-amber-600">-0.2% difference</span>
+        </div>
+        <div class="h-2 bg-slate-100 rounded-full overflow-hidden">
+         <div class="h-full bg-amber-500 rounded-full" style="width: 75%;"></div>
+        </div>
+       </div>
+       <div class="flex items-center justify-between mt-4 pt-4 border-t border-slate-100">
+        <div class="flex items-center gap-2">
+         <div class="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-700 font-semibold text-xs">
+          VK
+         </div><span class="text-sm text-slate-600">Vijay Kumar (Manager)</span>
+        </div><button class="p-2 hover:bg-slate-100 rounded-lg transition">
+         <svg class="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+         </svg></button>
+       </div>
+      </div>
+      <div class="card p-5">
+       <div class="flex items-start justify-between mb-4">
+        <div class="flex items-center gap-3">
+         <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center text-white font-bold text-lg">
+          K
+         </div>
+         <div>
+          <h3 class="font-bold text-slate-800">Kheda Collection Point</h3>
+          <p class="text-sm text-slate-500">Kheda, Gujarat</p>
+         </div>
+        </div><span class="px-3 py-1 text-xs font-semibold bg-green-100 text-green-700 rounded-full">Active</span>
+       </div>
+       <div class="grid grid-cols-3 gap-4 mb-4">
+        <div class="bg-slate-50 rounded-xl p-3">
+         <p class="text-xs text-slate-500 mb-1">Total Milk</p>
+         <p class="text-xl font-bold text-slate-800">4,120 L</p>
+        </div>
+        <div class="bg-slate-50 rounded-xl p-3">
+         <p class="text-xs text-slate-500 mb-1">Avg FAT</p>
+         <p class="text-xl font-bold text-green-600">4.1%</p>
+        </div>
+        <div class="bg-slate-50 rounded-xl p-3">
+         <p class="text-xs text-slate-500 mb-1">Avg SNF</p>
+         <p class="text-xl font-bold text-blue-600">8.5%</p>
+        </div>
+       </div>
+       <div class="border-t border-slate-100 pt-4">
+        <div class="flex items-center justify-between mb-2"><span class="text-sm text-slate-600">Tank FAT vs Farmer Avg</span> <span class="text-sm font-semibold text-red-600">-0.5% difference ⚠</span>
+        </div>
+        <div class="h-2 bg-slate-100 rounded-full overflow-hidden">
+         <div class="h-full bg-red-500 rounded-full" style="width: 45%;"></div>
+        </div>
+       </div>
+       <div class="flex items-center justify-between mt-4 pt-4 border-t border-slate-100">
+        <div class="flex items-center gap-2">
+         <div class="w-8 h-8 rounded-full bg-purple-100 flex items-center justify-center text-purple-700 font-semibold text-xs">
+          SP
+         </div><span class="text-sm text-slate-600">Suresh Patel (Manager)</span>
+        </div><button class="p-2 hover:bg-slate-100 rounded-lg transition">
+         <svg class="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+         </svg></button>
+       </div>
+      </div>
+      <div class="card p-5">
+       <div class="flex items-start justify-between mb-4">
+        <div class="flex items-center gap-3">
+         <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-purple-500 to-purple-600 flex items-center justify-center text-white font-bold text-lg">
+          M
+         </div>
+         <div>
+          <h3 class="font-bold text-slate-800">Mehsana Milk Hub</h3>
+          <p class="text-sm text-slate-500">Mehsana, Gujarat</p>
+         </div>
+        </div><span class="px-3 py-1 text-xs font-semibold bg-green-100 text-green-700 rounded-full">Active</span>
+       </div>
+       <div class="grid grid-cols-3 gap-4 mb-4">
+        <div class="bg-slate-50 rounded-xl p-3">
+         <p class="text-xs text-slate-500 mb-1">Total Milk</p>
+         <p class="text-xl font-bold text-slate-800">6,890 L</p>
+        </div>
+        <div class="bg-slate-50 rounded-xl p-3">
+         <p class="text-xs text-slate-500 mb-1">Avg FAT</p>
+         <p class="text-xl font-bold text-green-600">4.4%</p>
+        </div>
+        <div class="bg-slate-50 rounded-xl p-3">
+         <p class="text-xs text-slate-500 mb-1">Avg SNF</p>
+         <p class="text-xl font-bold text-blue-600">8.8%</p>
+        </div>
+       </div>
+       <div class="border-t border-slate-100 pt-4">
+        <div class="flex items-center justify-between mb-2"><span class="text-sm text-slate-600">Tank FAT vs Farmer Avg</span> <span class="text-sm font-semibold text-green-600">-0.1% difference ✓</span>
+        </div>
+        <div class="h-2 bg-slate-100 rounded-full overflow-hidden">
+         <div class="h-full bg-green-500 rounded-full" style="width: 92%;"></div>
+        </div>
+       </div>
+       <div class="flex items-center justify-between mt-4 pt-4 border-t border-slate-100">
+        <div class="flex items-center gap-2">
+         <div class="w-8 h-8 rounded-full bg-amber-100 flex items-center justify-center text-amber-700 font-semibold text-xs">
+          RD
+         </div><span class="text-sm text-slate-600">Ramesh Desai (Manager)</span>
+        </div><button class="p-2 hover:bg-slate-100 rounded-lg transition">
+         <svg class="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+         </svg></button>
+       </div>
+      </div>
+      <div class="card p-5">
+       <div class="flex items-start justify-between mb-4">
+        <div class="flex items-center gap-3">
+         <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-amber-500 to-orange-600 flex items-center justify-center text-white font-bold text-lg">
+          N
+         </div>
+         <div>
+          <h3 class="font-bold text-slate-800">Nadiad Dairy Center</h3>
+          <p class="text-sm text-slate-500">Nadiad, Gujarat</p>
+         </div>
+        </div><span class="px-3 py-1 text-xs font-semibold bg-green-100 text-green-700 rounded-full">Active</span>
+       </div>
+       <div class="grid grid-cols-3 gap-4 mb-4">
+        <div class="bg-slate-50 rounded-xl p-3">
+         <p class="text-xs text-slate-500 mb-1">Total Milk</p>
+         <p class="text-xl font-bold text-slate-800">3,450 L</p>
+        </div>
+        <div class="bg-slate-50 rounded-xl p-3">
+         <p class="text-xs text-slate-500 mb-1">Avg FAT</p>
+         <p class="text-xl font-bold text-green-600">4.0%</p>
+        </div>
+        <div class="bg-slate-50 rounded-xl p-3">
+         <p class="text-xs text-slate-500 mb-1">Avg SNF</p>
+         <p class="text-xl font-bold text-blue-600">8.4%</p>
+        </div>
+       </div>
+       <div class="border-t border-slate-100 pt-4">
+        <div class="flex items-center justify-between mb-2"><span class="text-sm text-slate-600">Tank FAT vs Farmer Avg</span> <span class="text-sm font-semibold text-amber-600">-0.3% difference</span>
+        </div>
+        <div class="h-2 bg-slate-100 rounded-full overflow-hidden">
+         <div class="h-full bg-amber-500 rounded-full" style="width: 68%;"></div>
+        </div>
+       </div>
+       <div class="flex items-center justify-between mt-4 pt-4 border-t border-slate-100">
+        <div class="flex items-center gap-2">
+         <div class="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center text-green-700 font-semibold text-xs">
+          AJ
+         </div><span class="text-sm text-slate-600">Amit Joshi (Manager)</span>
+        </div><button class="p-2 hover:bg-slate-100 rounded-lg transition">
+         <svg class="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+         </svg></button>
+       </div>
+      </div>
+     </div>
+    </div><!-- Rate Chart Screen -->
+    <div id="screen-ratechart" class="screen hidden p-6">
+     <div class="flex items-center justify-between mb-6">
+      <div>
+       <h2 class="text-2xl font-bold text-slate-800">Smart Rate Chart</h2>
+       <p class="text-slate-500 text-sm mt-1">Configure milk purchase rates based on FAT and SNF values</p>
+      </div>
+     </div>
+     <div class="grid grid-cols-3 gap-5"><!-- Base Rate Configuration -->
+      <div class="card p-6 col-span-2">
+       <h3 class="font-semibold text-slate-800 mb-5">Base Rate Configuration</h3>
+       <div class="grid grid-cols-3 gap-4 mb-6">
+        <div><label class="block text-sm font-medium text-slate-600 mb-2">Base FAT (%)</label> <input type="number" value="3.5" step="0.1" class="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500 text-lg font-semibold">
+        </div>
+        <div><label class="block text-sm font-medium text-slate-600 mb-2">Base SNF (%)</label> <input type="number" value="8.5" step="0.1" class="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500 text-lg font-semibold">
+        </div>
+        <div><label class="block text-sm font-medium text-slate-600 mb-2">Base Rate (₹/L)</label> <input type="number" value="32.00" step="0.50" class="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500 text-lg font-semibold">
+        </div>
+       </div>
+       <div class="bg-blue-50 rounded-xl p-4 mb-6">
+        <h4 class="font-semibold text-blue-800 mb-2 flex items-center gap-2">
+         <svg class="w-5 h-5" fill="currentColor" viewbox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z" />
+         </svg> Rate Calculation Formula</h4>
+        <p class="text-sm text-blue-700 font-mono bg-blue-100 rounded-lg p-3">Rate = Base Rate + (FAT - Base FAT) × ₹0.50 + (SNF - Base SNF) × ₹0.30</p>
+       </div>
+       <div class="flex items-center gap-4 mb-6">
+        <div class="flex-1"><label class="block text-sm font-medium text-slate-600 mb-2">Effective Date</label> <input type="date" value="2024-01-16" class="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500">
+        </div>
+        <div class="flex-1"><label class="block text-sm font-medium text-slate-600 mb-2">Apply To</label> <select class="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500"> <option>All Centers</option> <option>Anand Dairy Center</option> <option>Kheda Collection Point</option> </select>
+        </div>
+       </div><button class="w-full py-3 bg-gradient-to-r from-green-600 to-emerald-600 text-white font-semibold rounded-xl shadow-lg shadow-green-200 hover:shadow-green-300 transition"> Save &amp; Apply Rate Chart </button>
+      </div><!-- Rate Preview -->
+      <div class="card p-6">
+       <h3 class="font-semibold text-slate-800 mb-5">Rate Preview Calculator</h3>
+       <div class="space-y-4 mb-6">
+        <div><label class="block text-sm font-medium text-slate-600 mb-2">Sample FAT (%)</label> <input type="number" id="sample-fat" value="4.2" step="0.1" class="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500" oninput="calculateRate()">
+        </div>
+        <div><label class="block text-sm font-medium text-slate-600 mb-2">Sample SNF (%)</label> <input type="number" id="sample-snf" value="8.7" step="0.1" class="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500" oninput="calculateRate()">
+        </div>
+       </div>
+       <div class="bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl p-5 text-center">
+        <p class="text-sm text-slate-600 mb-1">Calculated Rate</p>
+        <p id="calculated-rate" class="text-4xl font-bold text-green-700">₹32.41</p>
+        <p class="text-xs text-slate-500 mt-1">per liter</p>
+       </div>
+      </div>
+     </div><!-- Rate History -->
+     <div class="card p-5 mt-5">
+      <h3 class="font-semibold text-slate-800 mb-5">Rate Change History</h3>
+      <table class="w-full">
+       <thead>
+        <tr class="border-b border-slate-100">
+         <th class="text-left py-3 px-4 text-xs font-semibold text-slate-500 uppercase">Effective Date</th>
+         <th class="text-left py-3 px-4 text-xs font-semibold text-slate-500 uppercase">Base FAT</th>
+         <th class="text-left py-3 px-4 text-xs font-semibold text-slate-500 uppercase">Base SNF</th>
+         <th class="text-left py-3 px-4 text-xs font-semibold text-slate-500 uppercase">Base Rate</th>
+         <th class="text-left py-3 px-4 text-xs font-semibold text-slate-500 uppercase">Changed By</th>
+         <th class="text-left py-3 px-4 text-xs font-semibold text-slate-500 uppercase">Status</th>
+        </tr>
+       </thead>
+       <tbody>
+        <tr class="table-row border-b border-slate-50 transition">
+         <td class="py-3 px-4 text-sm text-slate-700 font-medium">Jan 15, 2024</td>
+         <td class="py-3 px-4 text-sm text-slate-600">3.5%</td>
+         <td class="py-3 px-4 text-sm text-slate-600">8.5%</td>
+         <td class="py-3 px-4 text-sm text-slate-600 font-semibold">₹32.00</td>
+         <td class="py-3 px-4 text-sm text-slate-600">Rajesh Sharma</td>
+         <td class="py-3 px-4"><span class="px-2 py-1 text-xs font-medium bg-green-100 text-green-700 rounded-full">Active</span></td>
+        </tr>
+        <tr class="table-row border-b border-slate-50 transition">
+         <td class="py-3 px-4 text-sm text-slate-700 font-medium">Jan 01, 2024</td>
+         <td class="py-3 px-4 text-sm text-slate-600">3.5%</td>
+         <td class="py-3 px-4 text-sm text-slate-600">8.5%</td>
+         <td class="py-3 px-4 text-sm text-slate-600 font-semibold">₹31.50</td>
+         <td class="py-3 px-4 text-sm text-slate-600">Rajesh Sharma</td>
+         <td class="py-3 px-4"><span class="px-2 py-1 text-xs font-medium bg-slate-100 text-slate-600 rounded-full">Expired</span></td>
+        </tr>
+        <tr class="table-row transition">
+         <td class="py-3 px-4 text-sm text-slate-700 font-medium">Dec 01, 2023</td>
+         <td class="py-3 px-4 text-sm text-slate-600">3.5%</td>
+         <td class="py-3 px-4 text-sm text-slate-600">8.5%</td>
+         <td class="py-3 px-4 text-sm text-slate-600 font-semibold">₹30.00</td>
+         <td class="py-3 px-4 text-sm text-slate-600">Vijay Kumar</td>
+         <td class="py-3 px-4"><span class="px-2 py-1 text-xs font-medium bg-slate-100 text-slate-600 rounded-full">Expired</span></td>
+        </tr>
+       </tbody>
+      </table>
+     </div>
+    </div><!-- Audit Log Screen -->
+    <div id="screen-audit" class="screen hidden p-6">
+     <div class="flex items-center justify-between mb-6">
+      <div>
+       <h2 class="text-2xl font-bold text-slate-800">Audit Log &amp; Change Tracking</h2>
+       <p class="text-slate-500 text-sm mt-1">Complete history of all system changes for compliance</p>
+      </div>
+      <div class="flex items-center gap-3"><select class="px-4 py-2 bg-white border border-slate-200 rounded-xl text-sm text-slate-600 focus:outline-none focus:ring-2 focus:ring-green-500"> <option>All Changes</option> <option>Rate Changes</option> <option>Data Modifications</option> <option>User Actions</option> </select> <input type="date" class="px-4 py-2 bg-white border border-slate-200 rounded-xl text-sm text-slate-600 focus:outline-none focus:ring-2 focus:ring-green-500"> <button class="px-4 py-2 bg-blue-600 text-white font-medium rounded-xl hover:bg-blue-700 transition"> Export Log </button>
+      </div>
+     </div>
+     <div class="card p-5">
+      <table class="w-full">
+       <thead>
+        <tr class="border-b border-slate-200">
+         <th class="text-left py-4 px-4 text-xs font-semibold text-slate-500 uppercase">Timestamp</th>
+         <th class="text-left py-4 px-4 text-xs font-semibold text-slate-500 uppercase">Action</th>
+         <th class="text-left py-4 px-4 text-xs font-semibold text-slate-500 uppercase">Old Value</th>
+         <th class="text-left py-4 px-4 text-xs font-semibold text-slate-500 uppercase">New Value</th>
+         <th class="text-left py-4 px-4 text-xs font-semibold text-slate-500 uppercase">Center</th>
+         <th class="text-left py-4 px-4 text-xs font-semibold text-slate-500 uppercase">Changed By</th>
+         <th class="text-left py-4 px-4 text-xs font-semibold text-slate-500 uppercase">Severity</th>
+        </tr>
+       </thead>
+       <tbody>
+        <tr class="table-row border-b border-slate-50 transition bg-red-50">
+         <td class="py-4 px-4 text-sm text-slate-700">Jan 15, 2024 09:45 AM</td>
+         <td class="py-4 px-4 text-sm text-slate-700 font-medium">Rate Modification</td>
+         <td class="py-4 px-4 text-sm text-slate-600">₹31.50/L</td>
+         <td class="py-4 px-4 text-sm text-green-600 font-semibold">₹32.00/L</td>
+         <td class="py-4 px-4 text-sm text-slate-600">All Centers</td>
+         <td class="py-4 px-4">
+          <div class="flex items-center gap-2">
+           <div class="w-6 h-6 rounded-full bg-blue-100 flex items-center justify-center text-blue-700 font-semibold text-xs">
+            RS
+           </div><span class="text-sm text-slate-700">Rajesh (Admin)</span>
+          </div></td>
+         <td class="py-4 px-4"><span class="px-2 py-1 text-xs font-medium bg-red-100 text-red-700 rounded-full flex items-center gap-1 w-fit">
+           <svg class="w-3 h-3" fill="currentColor" viewbox="0 0 24 24">
+            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z" />
+           </svg> Critical </span></td>
+        </tr>
+        <tr class="table-row border-b border-slate-50 transition">
+         <td class="py-4 px-4 text-sm text-slate-700">Jan 15, 2024 08:30 AM</td>
+         <td class="py-4 px-4 text-sm text-slate-700 font-medium">Farmer Data Update</td>
+         <td class="py-4 px-4 text-sm text-slate-600">FAT: 4.0%</td>
+         <td class="py-4 px-4 text-sm text-green-600 font-semibold">FAT: 4.2%</td>
+         <td class="py-4 px-4 text-sm text-slate-600">Anand Dairy</td>
+         <td class="py-4 px-4">
+          <div class="flex items-center gap-2">
+           <div class="w-6 h-6 rounded-full bg-green-100 flex items-center justify-center text-green-700 font-semibold text-xs">
+            VK
+           </div><span class="text-sm text-slate-700">Vijay (Manager)</span>
+          </div></td>
+         <td class="py-4 px-4"><span class="px-2 py-1 text-xs font-medium bg-amber-100 text-amber-700 rounded-full">Medium</span></td>
+        </tr>
+        <tr class="table-row border-b border-slate-50 transition">
+         <td class="py-4 px-4 text-sm text-slate-700">Jan 15, 2024 07:15 AM</td>
+         <td class="py-4 px-4 text-sm text-slate-700 font-medium">Collection Entry</td>
+         <td class="py-4 px-4 text-sm text-slate-600">-</td>
+         <td class="py-4 px-4 text-sm text-green-600 font-semibold">125L Added</td>
+         <td class="py-4 px-4 text-sm text-slate-600">Kheda Point</td>
+         <td class="py-4 px-4">
+          <div class="flex items-center gap-2">
+           <div class="w-6 h-6 rounded-full bg-purple-100 flex items-center justify-center text-purple-700 font-semibold text-xs">
+            SP
+           </div><span class="text-sm text-slate-700">Suresh (Manager)</span>
+          </div></td>
+         <td class="py-4 px-4"><span class="px-2 py-1 text-xs font-medium bg-blue-100 text-blue-700 rounded-full">Low</span></td>
+        </tr>
+        <tr class="table-row border-b border-slate-50 transition bg-amber-50">
+         <td class="py-4 px-4 text-sm text-slate-700">Jan 14, 2024 06:00 PM</td>
+         <td class="py-4 px-4 text-sm text-slate-700 font-medium">Quality Override</td>
+         <td class="py-4 px-4 text-sm text-slate-600">Rejected</td>
+         <td class="py-4 px-4 text-sm text-amber-600 font-semibold">Approved</td>
+         <td class="py-4 px-4 text-sm text-slate-600">Mehsana Hub</td>
+         <td class="py-4 px-4">
+          <div class="flex items-center gap-2">
+           <div class="w-6 h-6 rounded-full bg-blue-100 flex items-center justify-center text-blue-700 font-semibold text-xs">
+            RS
+           </div><span class="text-sm text-slate-700">Rajesh (Admin)</span>
+          </div></td>
+         <td class="py-4 px-4"><span class="px-2 py-1 text-xs font-medium bg-amber-100 text-amber-700 rounded-full flex items-center gap-1 w-fit">
+           <svg class="w-3 h-3" fill="currentColor" viewbox="0 0 24 24">
+            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z" />
+           </svg> Warning </span></td>
+        </tr>
+        <tr class="table-row transition">
+         <td class="py-4 px-4 text-sm text-slate-700">Jan 14, 2024 04:30 PM</td>
+         <td class="py-4 px-4 text-sm text-slate-700 font-medium">User Login</td>
+         <td class="py-4 px-4 text-sm text-slate-600">-</td>
+         <td class="py-4 px-4 text-sm text-green-600 font-semibold">Session Started</td>
+         <td class="py-4 px-4 text-sm text-slate-600">System</td>
+         <td class="py-4 px-4">
+          <div class="flex items-center gap-2">
+           <div class="w-6 h-6 rounded-full bg-amber-100 flex items-center justify-center text-amber-700 font-semibold text-xs">
+            RD
+           </div><span class="text-sm text-slate-700">Ramesh (Manager)</span>
+          </div></td>
+         <td class="py-4 px-4"><span class="px-2 py-1 text-xs font-medium bg-slate-100 text-slate-600 rounded-full">Info</span></td>
+        </tr>
+       </tbody>
+      </table><!-- Pagination -->
+      <div class="flex items-center justify-between mt-5 pt-5 border-t border-slate-100">
+       <p class="text-sm text-slate-500">Showing 1-5 of 248 entries</p>
+       <div class="flex items-center gap-2"><button class="px-4 py-2 text-sm font-medium text-slate-600 hover:bg-slate-100 rounded-lg transition">Previous</button> <button class="px-4 py-2 text-sm font-medium text-white bg-green-600 rounded-lg">1</button> <button class="px-4 py-2 text-sm font-medium text-slate-600 hover:bg-slate-100 rounded-lg transition">2</button> <button class="px-4 py-2 text-sm font-medium text-slate-600 hover:bg-slate-100 rounded-lg transition">3</button> <button class="px-4 py-2 text-sm font-medium text-slate-600 hover:bg-slate-100 rounded-lg transition">Next</button>
+       </div>
+      </div>
+     </div>
+    </div><!-- Quality Control Screen -->
+    <div id="screen-quality" class="screen hidden p-6">
+     <div class="flex items-center justify-between mb-6">
+      <div>
+       <h2 class="text-2xl font-bold text-slate-800">Quality Control &amp; Comparison</h2>
+       <p class="text-slate-500 text-sm mt-1">Monitor milk quality and detect potential adulteration</p>
+      </div><select class="px-4 py-2 bg-white border border-slate-200 rounded-xl text-sm text-slate-600 focus:outline-none focus:ring-2 focus:ring-green-500"> <option>All Centers</option> <option>Anand Dairy Center</option> <option>Kheda Collection Point</option> </select>
+     </div><!-- Quality Cards -->
+     <div class="grid grid-cols-4 gap-5 mb-6">
+      <div class="card p-5 border-l-4 border-green-500">
+       <p class="text-xs font-semibold text-slate-500 uppercase">Excellent Quality</p>
+       <p class="text-3xl font-bold text-green-600 mt-2">156</p>
+       <p class="text-sm text-slate-500">Farmers (78%)</p>
+      </div>
+      <div class="card p-5 border-l-4 border-blue-500">
+       <p class="text-xs font-semibold text-slate-500 uppercase">Good Quality</p>
+       <p class="text-3xl font-bold text-blue-600 mt-2">32</p>
+       <p class="text-sm text-slate-500">Farmers (16%)</p>
+      </div>
+      <div class="card p-5 border-l-4 border-amber-500">
+       <p class="text-xs font-semibold text-slate-500 uppercase">Average Quality</p>
+       <p class="text-3xl font-bold text-amber-600 mt-2">9</p>
+       <p class="text-sm text-slate-500">Farmers (4.5%)</p>
+      </div>
+      <div class="card p-5 border-l-4 border-red-500">
+       <p class="text-xs font-semibold text-slate-500 uppercase">Risk Detected</p>
+       <p class="text-3xl font-bold text-red-600 mt-2">3</p>
+       <p class="text-sm text-slate-500">Farmers (1.5%)</p>
+      </div>
+     </div><!-- Comparison Chart -->
+     <div class="grid grid-cols-2 gap-5 mb-6">
+      <div class="card p-5">
+       <h3 class="font-semibold text-slate-800 mb-5">Farmer Avg vs Tank FAT Comparison</h3>
+       <div class="space-y-4">
+        <div>
+         <div class="flex justify-between mb-1"><span class="text-sm text-slate-600">Anand Dairy</span> <span class="text-sm font-medium text-slate-800">Farmer: 4.3% | Tank: 4.1%</span>
+         </div>
+         <div class="h-4 bg-slate-100 rounded-full overflow-hidden flex">
+          <div class="h-full bg-green-500" style="width: 43%;"></div>
+          <div class="h-full bg-green-300" style="width: 41%;"></div>
+         </div>
+         <p class="text-xs text-amber-600 mt-1">⚠ -0.2% deviation</p>
+        </div>
+        <div>
+         <div class="flex justify-between mb-1"><span class="text-sm text-slate-600">Kheda Point</span> <span class="text-sm font-medium text-slate-800">Farmer: 4.1% | Tank: 3.6%</span>
+         </div>
+         <div class="h-4 bg-slate-100 rounded-full overflow-hidden flex">
+          <div class="h-full bg-red-500" style="width: 41%;"></div>
+          <div class="h-full bg-red-300" style="width: 36%;"></div>
+         </div>
+         <p class="text-xs text-red-600 mt-1">⚠ -0.5% deviation - INVESTIGATE</p>
+        </div>
+        <div>
+         <div class="flex justify-between mb-1"><span class="text-sm text-slate-600">Mehsana Hub</span> <span class="text-sm font-medium text-slate-800">Farmer: 4.4% | Tank: 4.3%</span>
+         </div>
+         <div class="h-4 bg-slate-100 rounded-full overflow-hidden flex">
+          <div class="h-full bg-green-500" style="width: 44%;"></div>
+          <div class="h-full bg-green-300" style="width: 43%;"></div>
+         </div>
+         <p class="text-xs text-green-600 mt-1">✓ -0.1% deviation (Normal)</p>
+        </div>
+        <div>
+         <div class="flex justify-between mb-1"><span class="text-sm text-slate-600">Nadiad Center</span> <span class="text-sm font-medium text-slate-800">Farmer: 4.0% | Tank: 3.7%</span>
+         </div>
+         <div class="h-4 bg-slate-100 rounded-full overflow-hidden flex">
+          <div class="h-full bg-amber-500" style="width: 40%;"></div>
+          <div class="h-full bg-amber-300" style="width: 37%;"></div>
+         </div>
+         <p class="text-xs text-amber-600 mt-1">⚠ -0.3% deviation</p>
+        </div>
+       </div>
+      </div>
+      <div class="card p-5">
+       <h3 class="font-semibold text-slate-800 mb-5">Risk Analysis</h3>
+       <div class="flex items-center justify-center h-48">
+        <div class="relative w-48 h-48">
+         <svg class="w-full h-full transform -rotate-90" viewbox="0 0 100 100"><circle cx="50" cy="50" r="40" fill="none" stroke="#e2e8f0" stroke-width="12" /> <circle cx="50" cy="50" r="40" fill="none" stroke="#22c55e" stroke-width="12" stroke-dasharray="196" stroke-dashoffset="43" /> <circle cx="50" cy="50" r="40" fill="none" stroke="#3b82f6" stroke-width="12" stroke-dasharray="196" stroke-dashoffset="153" /> <circle cx="50" cy="50" r="40" fill="none" stroke="#f59e0b" stroke-width="12" stroke-dasharray="196" stroke-dashoffset="183" /> <circle cx="50" cy="50" r="40" fill="none" stroke="#ef4444" stroke-width="12" stroke-dasharray="196" stroke-dashoffset="193" />
+         </svg>
+         <div class="absolute inset-0 flex items-center justify-center">
+          <div class="text-center">
+           <p class="text-3xl font-bold text-slate-800">200</p>
+           <p class="text-sm text-slate-500">Total Farmers</p>
+          </div>
+         </div>
+        </div>
+       </div>
+       <div class="grid grid-cols-2 gap-3 mt-4">
+        <div class="flex items-center gap-2"><span class="w-3 h-3 rounded-full bg-green-500"></span> <span class="text-sm text-slate-600">Excellent (78%)</span>
+        </div>
+        <div class="flex items-center gap-2"><span class="w-3 h-3 rounded-full bg-blue-500"></span> <span class="text-sm text-slate-600">Good (16%)</span>
+        </div>
+        <div class="flex items-center gap-2"><span class="w-3 h-3 rounded-full bg-amber-500"></span> <span class="text-sm text-slate-600">Average (4.5%)</span>
+        </div>
+        <div class="flex items-center gap-2"><span class="w-3 h-3 rounded-full bg-red-500"></span> <span class="text-sm text-slate-600">Risk (1.5%)</span>
+        </div>
+       </div>
+      </div>
+     </div><!-- Risk Table -->
+     <div class="card p-5">
+      <h3 class="font-semibold text-slate-800 mb-5">High Risk Farmers - Water Mixing Suspected</h3>
+      <table class="w-full">
+       <thead>
+        <tr class="border-b border-slate-100">
+         <th class="text-left py-3 px-4 text-xs font-semibold text-slate-500 uppercase">Farmer</th>
+         <th class="text-left py-3 px-4 text-xs font-semibold text-slate-500 uppercase">Center</th>
+         <th class="text-left py-3 px-4 text-xs font-semibold text-slate-500 uppercase">Avg FAT</th>
+         <th class="text-left py-3 px-4 text-xs font-semibold text-slate-500 uppercase">Avg SNF</th>
+         <th class="text-left py-3 px-4 text-xs font-semibold text-slate-500 uppercase">Expected</th>
+         <th class="text-left py-3 px-4 text-xs font-semibold text-slate-500 uppercase">Deviation</th>
+         <th class="text-left py-3 px-4 text-xs font-semibold text-slate-500 uppercase">Risk Level</th>
+         <th class="text-left py-3 px-4 text-xs font-semibold text-slate-500 uppercase">Action</th>
+        </tr>
+       </thead>
+       <tbody>
+        <tr class="table-row border-b border-slate-50 transition bg-red-50">
+         <td class="py-3 px-4">
+          <div class="flex items-center gap-2">
+           <div class="w-8 h-8 rounded-full bg-slate-200 flex items-center justify-center text-slate-700 font-semibold text-xs">
+            RP
+           </div>
+           <div>
+            <p class="text-sm font-medium text-slate-800">Ramji Patel</p>
+            <p class="text-xs text-slate-500">FRM-1045</p>
+           </div>
+          </div></td>
+         <td class="py-3 px-4 text-sm text-slate-600">Anand Dairy</td>
+         <td class="py-3 px-4 text-sm text-red-600 font-semibold">2.8%</td>
+         <td class="py-3 px-4 text-sm text-red-600 font-semibold">7.2%</td>
+         <td class="py-3 px-4 text-sm text-slate-600">FAT: 4.0% | SNF: 8.5%</td>
+         <td class="py-3 px-4 text-sm text-red-600 font-semibold">-30%</td>
+         <td class="py-3 px-4"><span class="px-2 py-1 text-xs font-medium bg-red-100 text-red-700 rounded-full">High Risk</span></td>
+         <td class="py-3 px-4"><button class="px-3 py-1.5 text-xs font-medium text-white bg-red-600 hover:bg-red-700 rounded-lg transition"> Investigate </button></td>
+        </tr>
+        <tr class="table-row border-b border-slate-50 transition bg-red-50">
+         <td class="py-3 px-4">
+          <div class="flex items-center gap-2">
+           <div class="w-8 h-8 rounded-full bg-slate-200 flex items-center justify-center text-slate-700 font-semibold text-xs">
+            MS
+           </div>
+           <div>
+            <p class="text-sm font-medium text-slate-800">Mohan Shah</p>
+            <p class="text-xs text-slate-500">FRM-0892</p>
+           </div>
+          </div></td>
+         <td class="py-3 px-4 text-sm text-slate-600">Kheda Point</td>
+         <td class="py-3 px-4 text-sm text-red-600 font-semibold">3.1%</td>
+         <td class="py-3 px-4 text-sm text-red-600 font-semibold">7.5%</td>
+         <td class="py-3 px-4 text-sm text-slate-600">FAT: 4.0% | SNF: 8.5%</td>
+         <td class="py-3 px-4 text-sm text-red-600 font-semibold">-23%</td>
+         <td class="py-3 px-4"><span class="px-2 py-1 text-xs font-medium bg-red-100 text-red-700 rounded-full">High Risk</span></td>
+         <td class="py-3 px-4"><button class="px-3 py-1.5 text-xs font-medium text-white bg-red-600 hover:bg-red-700 rounded-lg transition"> Investigate </button></td>
+        </tr>
+        <tr class="table-row transition bg-red-50">
+         <td class="py-3 px-4">
+          <div class="flex items-center gap-2">
+           <div class="w-8 h-8 rounded-full bg-slate-200 flex items-center justify-center text-slate-700 font-semibold text-xs">
+            KD
+           </div>
+           <div>
+            <p class="text-sm font-medium text-slate-800">Kishan Desai</p>
+            <p class="text-xs text-slate-500">FRM-1203</p>
+           </div>
+          </div></td>
+         <td class="py-3 px-4 text-sm text-slate-600">Mehsana Hub</td>
+         <td class="py-3 px-4 text-sm text-red-600 font-semibold">2.5%</td>
+         <td class="py-3 px-4 text-sm text-red-600 font-semibold">6.9%</td>
+         <td class="py-3 px-4 text-sm text-slate-600">FAT: 4.0% | SNF: 8.5%</td>
+         <td class="py-3 px-4 text-sm text-red-600 font-semibold">-38%</td>
+         <td class="py-3 px-4"><span class="px-2 py-1 text-xs font-medium bg-red-100 text-red-700 rounded-full">Critical</span></td>
+         <td class="py-3 px-4"><button class="px-3 py-1.5 text-xs font-medium text-white bg-red-600 hover:bg-red-700 rounded-lg transition"> Investigate </button></td>
+        </tr>
+       </tbody>
+      </table>
+     </div>
+    </div><!-- Reports Screen -->
+    <div id="screen-reports" class="screen hidden p-6">
+     <div class="flex items-center justify-between mb-6">
+      <div>
+       <h2 class="text-2xl font-bold text-slate-800">Reports &amp; Analytics</h2>
+       <p class="text-slate-500 text-sm mt-1">Generate and export comprehensive dairy reports</p>
+      </div>
+     </div><!-- Report Types -->
+     <div class="grid grid-cols-4 gap-5 mb-6"><button class="card p-5 text-left hover:border-green-500 border-2 border-transparent transition group">
+       <div class="w-12 h-12 rounded-xl bg-green-100 flex items-center justify-center mb-4 group-hover:bg-green-500 transition">
+        <svg class="w-6 h-6 text-green-600 group-hover:text-white transition" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+        </svg>
+       </div><h3 class="font-semibold text-slate-800 mb-1">Daily Report</h3><p class="text-sm text-slate-500">Collection summary for today</p></button> <button class="card p-5 text-left hover:border-blue-500 border-2 border-transparent transition group">
+       <div class="w-12 h-12 rounded-xl bg-blue-100 flex items-center justify-center mb-4 group-hover:bg-blue-500 transition">
+        <svg class="w-6 h-6 text-blue-600 group-hover:text-white transition" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+        </svg>
+       </div><h3 class="font-semibold text-slate-800 mb-1">Monthly Report</h3><p class="text-sm text-slate-500">Monthly collection trends</p></button> <button class="card p-5 text-left hover:border-purple-500 border-2 border-transparent transition group">
+       <div class="w-12 h-12 rounded-xl bg-purple-100 flex items-center justify-center mb-4 group-hover:bg-purple-500 transition">
+        <svg class="w-6 h-6 text-purple-600 group-hover:text-white transition" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+        </svg>
+       </div><h3 class="font-semibold text-slate-800 mb-1">Farmer Report</h3><p class="text-sm text-slate-500">Individual farmer analysis</p></button> <button class="card p-5 text-left hover:border-amber-500 border-2 border-transparent transition group">
+       <div class="w-12 h-12 rounded-xl bg-amber-100 flex items-center justify-center mb-4 group-hover:bg-amber-500 transition">
+        <svg class="w-6 h-6 text-amber-600 group-hover:text-white transition" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+        </svg>
+       </div><h3 class="font-semibold text-slate-800 mb-1">Center Report</h3><p class="text-sm text-slate-500">Center-wise performance</p></button>
+     </div><!-- Report Configuration -->
+     <div class="card p-6 mb-6">
+      <h3 class="font-semibold text-slate-800 mb-5">Generate Custom Report</h3>
+      <div class="grid grid-cols-4 gap-4 mb-6">
+       <div><label class="block text-sm font-medium text-slate-600 mb-2">Report Type</label> <select class="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500"> <option>Daily Collection</option> <option>Monthly Summary</option> <option>Farmer-wise</option> <option>Center-wise</option> <option>Quality Analysis</option> </select>
+       </div>
+       <div><label class="block text-sm font-medium text-slate-600 mb-2">Date Range</label> <select class="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500"> <option>Today</option> <option>This Week</option> <option>This Month</option> <option>Custom Range</option> </select>
+       </div>
+       <div><label class="block text-sm font-medium text-slate-600 mb-2">Collection Center</label> <select class="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500"> <option>All Centers</option> <option>Anand Dairy Center</option> <option>Kheda Collection Point</option> <option>Mehsana Milk Hub</option> </select>
+       </div>
+       <div><label class="block text-sm font-medium text-slate-600 mb-2">Shift</label> <select class="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500"> <option>Both Shifts</option> <option>Morning Only</option> <option>Evening Only</option> </select>
+       </div>
+      </div>
+      <div class="flex gap-3"><button class="px-6 py-3 bg-gradient-to-r from-green-600 to-emerald-600 text-white font-semibold rounded-xl shadow-lg shadow-green-200 hover:shadow-green-300 transition flex items-center gap-2">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+        </svg> Generate Report </button> <button class="px-6 py-3 bg-blue-600 text-white font-semibold rounded-xl hover:bg-blue-700 transition flex items-center gap-2">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+        </svg> Export PDF </button> <button class="px-6 py-3 bg-emerald-600 text-white font-semibold rounded-xl hover:bg-emerald-700 transition flex items-center gap-2">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+        </svg> Export Excel </button>
+      </div>
+     </div><!-- Sample Report Preview -->
+     <div class="card p-6">
+      <div class="flex items-center justify-between mb-5">
+       <h3 class="font-semibold text-slate-800">Report Preview - Daily Collection (Jan 15, 2024)</h3><span class="text-sm text-slate-500">Generated just now</span>
+      </div>
+      <table class="w-full">
+       <thead>
+        <tr class="border-b border-slate-200">
+         <th class="text-left py-3 px-4 text-xs font-semibold text-slate-500 uppercase">Center</th>
+         <th class="text-left py-3 px-4 text-xs font-semibold text-slate-500 uppercase">Morning (L)</th>
+         <th class="text-left py-3 px-4 text-xs font-semibold text-slate-500 uppercase">Evening (L)</th>
+         <th class="text-left py-3 px-4 text-xs font-semibold text-slate-500 uppercase">Total (L)</th>
+         <th class="text-left py-3 px-4 text-xs font-semibold text-slate-500 uppercase">Avg FAT</th>
+         <th class="text-left py-3 px-4 text-xs font-semibold text-slate-500 uppercase">Avg SNF</th>
+         <th class="text-left py-3 px-4 text-xs font-semibold text-slate-500 uppercase">Value (₹)</th>
+        </tr>
+       </thead>
+       <tbody>
+        <tr class="table-row border-b border-slate-50 transition">
+         <td class="py-3 px-4 text-sm text-slate-700 font-medium">Anand Dairy Center</td>
+         <td class="py-3 px-4 text-sm text-slate-600">2,850</td>
+         <td class="py-3 px-4 text-sm text-slate-600">2,390</td>
+         <td class="py-3 px-4 text-sm text-slate-800 font-semibold">5,240</td>
+         <td class="py-3 px-4 text-sm text-green-600 font-semibold">4.3%</td>
+         <td class="py-3 px-4 text-sm text-blue-600 font-semibold">8.7%</td>
+         <td class="py-3 px-4 text-sm text-slate-800 font-semibold">₹1,69,768</td>
+        </tr>
+        <tr class="table-row border-b border-slate-50 transition">
+         <td class="py-3 px-4 text-sm text-slate-700 font-medium">Kheda Collection Point</td>
+         <td class="py-3 px-4 text-sm text-slate-600">2,240</td>
+         <td class="py-3 px-4 text-sm text-slate-600">1,880</td>
+         <td class="py-3 px-4 text-sm text-slate-800 font-semibold">4,120</td>
+         <td class="py-3 px-4 text-sm text-green-600 font-semibold">4.1%</td>
+         <td class="py-3 px-4 text-sm text-blue-600 font-semibold">8.5%</td>
+         <td class="py-3 px-4 text-sm text-slate-800 font-semibold">₹1,31,840</td>
+        </tr>
+        <tr class="table-row border-b border-slate-50 transition">
+         <td class="py-3 px-4 text-sm text-slate-700 font-medium">Mehsana Milk Hub</td>
+         <td class="py-3 px-4 text-sm text-slate-600">3,720</td>
+         <td class="py-3 px-4 text-sm text-slate-600">3,170</td>
+         <td class="py-3 px-4 text-sm text-slate-800 font-semibold">6,890</td>
+         <td class="py-3 px-4 text-sm text-green-600 font-semibold">4.4%</td>
+         <td class="py-3 px-4 text-sm text-blue-600 font-semibold">8.8%</td>
+         <td class="py-3 px-4 text-sm text-slate-800 font-semibold">₹2,24,854</td>
+        </tr>
+        <tr class="table-row transition bg-slate-50">
+         <td class="py-3 px-4 text-sm text-slate-800 font-bold">TOTAL</td>
+         <td class="py-3 px-4 text-sm text-slate-800 font-bold">8,810</td>
+         <td class="py-3 px-4 text-sm text-slate-800 font-bold">7,440</td>
+         <td class="py-3 px-4 text-sm text-slate-800 font-bold">16,250</td>
+         <td class="py-3 px-4 text-sm text-green-700 font-bold">4.27%</td>
+         <td class="py-3 px-4 text-sm text-blue-700 font-bold">8.67%</td>
+         <td class="py-3 px-4 text-sm text-slate-800 font-bold">₹5,26,462</td>
+        </tr>
+       </tbody>
+      </table>
+     </div>
+    </div><!-- Settings Screen -->
+    <div id="screen-settings" class="screen hidden p-6">
+     <div class="flex items-center justify-between mb-6">
+      <div>
+       <h2 class="text-2xl font-bold text-slate-800">Settings &amp; Access Control</h2>
+       <p class="text-slate-500 text-sm mt-1">Configure system settings and manage user permissions</p>
+      </div>
+     </div>
+     <div class="grid grid-cols-3 gap-5"><!-- User Management -->
+      <div class="card p-5 col-span-2">
+       <h3 class="font-semibold text-slate-800 mb-5">User Roles &amp; Permissions</h3>
+       <div class="space-y-4">
+        <div class="flex items-center justify-between p-4 bg-slate-50 rounded-xl">
+         <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center text-white font-semibold text-sm">
+           RS
+          </div>
+          <div>
+           <p class="font-medium text-slate-800">Rajesh Sharma</p>
+           <p class="text-sm text-slate-500">rajesh@dairypro.com</p>
+          </div>
+         </div>
+         <div class="flex items-center gap-3"><span class="px-3 py-1 text-xs font-semibold bg-purple-100 text-purple-700 rounded-full">Super Admin</span> <select class="px-3 py-2 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"> <option>All Centers</option> </select> <button class="p-2 hover:bg-slate-200 rounded-lg transition">
+           <svg class="w-4 h-4 text-slate-500" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+           </svg></button>
+         </div>
+        </div>
+        <div class="flex items-center justify-between p-4 bg-slate-50 rounded-xl">
+         <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-full bg-gradient-to-br from-green-500 to-green-600 flex items-center justify-center text-white font-semibold text-sm">
+           VK
+          </div>
+          <div>
+           <p class="font-medium text-slate-800">Vijay Kumar</p>
+           <p class="text-sm text-slate-500">vijay@dairypro.com</p>
+          </div>
+         </div>
+         <div class="flex items-center gap-3"><span class="px-3 py-1 text-xs font-semibold bg-green-100 text-green-700 rounded-full">Manager</span> <select class="px-3 py-2 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"> <option>Anand Dairy</option> <option>All Centers</option> </select> <button class="p-2 hover:bg-slate-200 rounded-lg transition">
+           <svg class="w-4 h-4 text-slate-500" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+           </svg></button>
+         </div>
+        </div>
+        <div class="flex items-center justify-between p-4 bg-slate-50 rounded-xl">
+         <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-full bg-gradient-to-br from-purple-500 to-purple-600 flex items-center justify-center text-white font-semibold text-sm">
+           SP
+          </div>
+          <div>
+           <p class="font-medium text-slate-800">Suresh Patel</p>
+           <p class="text-sm text-slate-500">suresh@dairypro.com</p>
+          </div>
+         </div>
+         <div class="flex items-center gap-3"><span class="px-3 py-1 text-xs font-semibold bg-green-100 text-green-700 rounded-full">Manager</span> <select class="px-3 py-2 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"> <option>Kheda Point</option> <option>All Centers</option> </select> <button class="p-2 hover:bg-slate-200 rounded-lg transition">
+           <svg class="w-4 h-4 text-slate-500" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+           </svg></button>
+         </div>
+        </div>
+        <div class="flex items-center justify-between p-4 bg-slate-50 rounded-xl">
+         <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-full bg-gradient-to-br from-amber-500 to-amber-600 flex items-center justify-center text-white font-semibold text-sm">
+           RD
+          </div>
+          <div>
+           <p class="font-medium text-slate-800">Ramesh Desai</p>
+           <p class="text-sm text-slate-500">ramesh@dairypro.com</p>
+          </div>
+         </div>
+         <div class="flex items-center gap-3"><span class="px-3 py-1 text-xs font-semibold bg-green-100 text-green-700 rounded-full">Manager</span> <select class="px-3 py-2 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"> <option>Mehsana Hub</option> <option>All Centers</option> </select> <button class="p-2 hover:bg-slate-200 rounded-lg transition">
+           <svg class="w-4 h-4 text-slate-500" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+           </svg></button>
+         </div>
+        </div>
+       </div><button class="mt-4 px-4 py-2 text-sm font-medium text-green-600 border border-green-600 rounded-xl hover:bg-green-50 transition flex items-center gap-2">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+        </svg> Add New User </button>
+      </div><!-- Company Settings -->
+      <div class="space-y-5">
+       <div class="card p-5">
+        <h3 class="font-semibold text-slate-800 mb-4">Dairy Profile</h3>
+        <div class="space-y-3">
+         <div><label class="block text-sm font-medium text-slate-600 mb-1">Dairy Name</label> <input type="text" value="DairyPro Enterprise" class="w-full px-3 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 text-sm">
+         </div>
+         <div><label class="block text-sm font-medium text-slate-600 mb-1">GSTIN</label> <input type="text" value="24AABCU9603R1ZM" class="w-full px-3 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 text-sm">
+         </div>
+         <div><label class="block text-sm font-medium text-slate-600 mb-1">Address</label> <textarea rows="2" class="w-full px-3 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 text-sm">Industrial Area, Anand, Gujarat 388001</textarea>
+         </div>
+        </div>
+       </div>
+       <div class="card p-5">
+        <h3 class="font-semibold text-slate-800 mb-4">Notifications</h3>
+        <div class="space-y-3"><label class="flex items-center justify-between cursor-pointer"> <span class="text-sm text-slate-600">Quality Alerts</span>
+          <div class="relative"><input type="checkbox" checked class="sr-only peer">
+           <div class="w-11 h-6 bg-slate-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-green-500 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-green-600"></div>
+          </div></label> <label class="flex items-center justify-between cursor-pointer"> <span class="text-sm text-slate-600">Daily Reports</span>
+          <div class="relative"><input type="checkbox" checked class="sr-only peer">
+           <div class="w-11 h-6 bg-slate-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-green-500 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-green-600"></div>
+          </div></label> <label class="flex items-center justify-between cursor-pointer"> <span class="text-sm text-slate-600">Rate Changes</span>
+          <div class="relative"><input type="checkbox" checked class="sr-only peer">
+           <div class="w-11 h-6 bg-slate-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-green-500 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-green-600"></div>
+          </div></label> <label class="flex items-center justify-between cursor-pointer"> <span class="text-sm text-slate-600">SMS Alerts</span>
+          <div class="relative"><input type="checkbox" class="sr-only peer">
+           <div class="w-11 h-6 bg-slate-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-green-500 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-green-600"></div>
+          </div></label>
+        </div>
+       </div>
+      </div>
+     </div>
+    </div>
+   </main>
+  </div>
+  <script>
+    // Default configuration
+    const defaultConfig = {
+      company_name: 'DairyPro Enterprise',
+      dashboard_title: 'Owner Dashboard',
+      primary_color: '#22c55e',
+      secondary_color: '#3b82f6',
+      background_color: '#f8fafc',
+      text_color: '#1e293b',
+      accent_color: '#10b981'
+    };
+    
+    let config = { ...defaultConfig };
+    
+    // Navigation function
+    function showScreen(screenId) {
+      // Hide all screens
+      document.querySelectorAll('.screen').forEach(screen => {
+        screen.classList.add('hidden');
+      });
+      
+      // Show selected screen
+      document.getElementById('screen-' + screenId).classList.remove('hidden');
+      
+      // Update navigation active state
+      document.querySelectorAll('.sidebar-item').forEach(item => {
+        item.classList.remove('active');
+      });
+      document.getElementById('nav-' + screenId).classList.add('active');
+    }
+    
+    // Rate calculation function
+    function calculateRate() {
+      const baseFat = 3.5;
+      const baseSnf = 8.5;
+      const baseRate = 32.00;
+      const fatRate = 0.50;
+      const snfRate = 0.30;
+      
+      const sampleFat = parseFloat(document.getElementById('sample-fat').value) || 0;
+      const sampleSnf = parseFloat(document.getElementById('sample-snf').value) || 0;
+      
+      const rate = baseRate + (sampleFat - baseFat) * fatRate + (sampleSnf - baseSnf) * snfRate;
+      document.getElementById('calculated-rate').textContent = '₹' + rate.toFixed(2);
+    }
+    
+    // Render function for config changes
+    async function onConfigChange(newConfig) {
+      config = { ...defaultConfig, ...newConfig };
+      
+      // Update company name
+      const companyNameEl = document.getElementById('company-name');
+      if (companyNameEl) {
+        companyNameEl.textContent = config.company_name || defaultConfig.company_name;
+      }
+      
+      // Update dashboard title
+      const dashboardTitleEl = document.getElementById('dashboard-title');
+      if (dashboardTitleEl) {
+        dashboardTitleEl.textContent = config.dashboard_title || defaultConfig.dashboard_title;
+      }
+      
+      // Apply colors
+      document.documentElement.style.setProperty('--primary-color', config.primary_color);
+      document.documentElement.style.setProperty('--secondary-color', config.secondary_color);
+    }
+    
+    // Map to capabilities for recoloring
+    function mapToCapabilities(config) {
+      return {
+        recolorables: [
+          {
+            get: () => config.background_color || defaultConfig.background_color,
+            set: (value) => {
+              config.background_color = value;
+              if (window.elementSdk) {
+                window.elementSdk.setConfig({ background_color: value });
+              }
+            }
+          },
+          {
+            get: () => config.primary_color || defaultConfig.primary_color,
+            set: (value) => {
+              config.primary_color = value;
+              if (window.elementSdk) {
+                window.elementSdk.setConfig({ primary_color: value });
+              }
+            }
+          },
+          {
+            get: () => config.text_color || defaultConfig.text_color,
+            set: (value) => {
+              config.text_color = value;
+              if (window.elementSdk) {
+                window.elementSdk.setConfig({ text_color: value });
+              }
+            }
+          },
+          {
+            get: () => config.secondary_color || defaultConfig.secondary_color,
+            set: (value) => {
+              config.secondary_color = value;
+              if (window.elementSdk) {
+                window.elementSdk.setConfig({ secondary_color: value });
+              }
+            }
+          },
+          {
+            get: () => config.accent_color || defaultConfig.accent_color,
+            set: (value) => {
+              config.accent_color = value;
+              if (window.elementSdk) {
+                window.elementSdk.setConfig({ accent_color: value });
+              }
+            }
+          }
+        ],
+        borderables: [],
+        fontEditable: undefined,
+        fontSizeable: undefined
+      };
+    }
+    
+    // Map to edit panel values
+    function mapToEditPanelValues(config) {
+      return new Map([
+        ['company_name', config.company_name || defaultConfig.company_name],
+        ['dashboard_title', config.dashboard_title || defaultConfig.dashboard_title]
+      ]);
+    }
+    
+    // Initialize Element SDK
+    if (window.elementSdk) {
+      window.elementSdk.init({
+        defaultConfig,
+        onConfigChange,
+        mapToCapabilities,
+        mapToEditPanelValues
+      });
+    }
+    
+    // Initial render
+    onConfigChange(config);
+  </script>
+ <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9c1d053bc548b85f',t:'MTc2OTA2MzYxMy4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>

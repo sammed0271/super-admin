@@ -2,6 +2,11 @@ import mongoose from "mongoose";
 
 const farmerSchema = new mongoose.Schema(
   {
+    centerId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "CollectionCenter",
+      required: true
+    },
     code: {
       type: String,
       unique: true,
@@ -19,7 +24,7 @@ const farmerSchema = new mongoose.Schema(
     },
     milkType: {
       type: [String],
-      enum: ["cow", "buffalo","mix"],
+      enum: ["cow", "buffalo", "mix"],
       required: true,
     },
     address: {

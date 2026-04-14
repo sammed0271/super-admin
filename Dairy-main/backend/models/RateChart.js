@@ -2,6 +2,11 @@ import mongoose from "mongoose";
 
 const rateChartSchema = new mongoose.Schema(
   {
+    centerId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "CollectionCenter",
+      required: true
+    },
     milkType: {
       type: String,
       enum: ["cow", "buffalo", "mix"],
