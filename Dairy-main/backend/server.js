@@ -1,11 +1,13 @@
 import dotenv from "dotenv";
-dotenv.config({ debug: false });
+dotenv.config();
+console.log("JWT_SECRET:", process.env.JWT_SECRET);
 
 import express from "express";
 import cors from "cors";
 import cookieParser from "cookie-parser";
 import { connectDB } from "./config/db.js";
 import router from "./routes/auth_routes.js";
+import centerRoutes from "./routes/center_routes.js";
 import farmerRoutes from "./routes/farmer_routes.js";
 import milkRoutes from "./routes/milk_routes.js";
 import deductionRoutes from "./routes/deduction_routes.js";
@@ -62,6 +64,7 @@ app.use("/api/reports", reportRoutes);
 app.use("/api/inventory-transactions", inventoryTransactionRoutes);
 app.use("/api/payments", paymentRoutes);
 
+app.use("/api/centers", centerRoutes);
 const PORT = process.env.PORT;
 
 app.listen(PORT, () => {

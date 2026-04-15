@@ -14,22 +14,34 @@ import Settings from "./pages/settings/settings";
 import Login from "./pages/login/login";
 import NotFound from "./pages/NotFound";
 
+
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
-  const isAuth = localStorage.getItem("superadmin-auth") === "true";
+  const token = localStorage.getItem("token"); // 🔥 use real token
   const location = useLocation();
 
-  if (!isAuth) {
+  const user = JSON.parse(localStorage.getItem("user") || "{}");
+
+  if (!token) {
     return <Navigate to="/login" state={{ from: location }} replace />;
   }
+
+  if (user.role !== "superadmin") {
+    return <Navigate to="/login" />;
+  }
+
   return <>{children}</>;
 };
 
 const App: React.FC = () => {
   return (
     <Routes>
+      {/* redirect root */}
       <Route path="/" element={<Navigate to="/dashboard" replace />} />
+
+      {/* public */}
       <Route path="/login" element={<Login />} />
 
+      {/* protected */}
       <Route
         element={
           <ProtectedRoute>
@@ -48,6 +60,7 @@ const App: React.FC = () => {
         <Route path="/settings" element={<Settings />} />
       </Route>
 
+      {/* fallback */}
       <Route path="*" element={<NotFound />} />
     </Routes>
   );
