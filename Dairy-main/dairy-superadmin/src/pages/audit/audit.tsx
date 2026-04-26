@@ -1,6 +1,17 @@
 import React, { useMemo, useState, useEffect } from "react";
-import { api } from "../../services/api";
+import { getAuditLogs } from "../../axios/audit_api";
 import type { AuditLog } from "../../types/models";
+
+type AuditRow = {
+  id: string;
+  action: string;
+  timestamp: string;
+  oldValue: string;
+  newValue: string;
+  centerId: string;
+  changedBy: string;
+  severity: "Critical" | "Warning" | "Medium" | "Low" | "Info";
+};
 
 const AuditLogPage: React.FC = () => {
   const [typeFilter, setTypeFilter] = useState("All Changes");
@@ -8,40 +19,65 @@ const AuditLogPage: React.FC = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 8;
 
-  const [auditRows, setAuditRows] = useState<AuditLog[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const [logs, setLogs] = useState<AuditRow[]>([]);
+  const [loading, setLoading] = useState(false);
+
+  const fetchLogs = async () => {
+    try {
+      setLoading(true);
+      const res = await getAuditLogs({ page: 1, limit: 50 });
+      console.log("Raw audit logs from backend:", res.logs);
+
+      // 🔥 normalize backend → UI
+      const formatted: AuditRow[] = res.logs.map((log: any) => ({
+        id: log._id,
+        action: log.action,
+        timestamp: log.createdAt,
+        oldValue: log.details?.oldValue || "-",
+        newValue: log.details?.newValue || "-",
+        centerId: log.entity || "-",
+        changedBy: log.userId?.name || "System",
+        severity: getSeverity(log.action),
+      }));
+
+      setLogs(formatted);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
+  const getSeverity = (action: string): AuditRow["severity"] => {
+    const a = action.toLowerCase();
+
+    if (a.includes("delete")) return "Critical";
+    if (a.includes("update")) return "Warning";
+    if (a.includes("create")) return "Info";
+
+    return "Low";
+  };
 
   useEffect(() => {
-    const fetchLogs = async () => {
-      setIsLoading(true);
-      try {
-        const logs = await api.getAuditLogs();
-        setAuditRows(logs);
-      } catch (err) {
-        console.error("Failed to load audit logs", err);
-      } finally {
-        setIsLoading(false);
-      }
-    };
     fetchLogs();
   }, []);
 
+
   const filteredRows = useMemo(() => {
-    return auditRows.filter((row) => {
+    return logs.filter((row) => {
       if (typeFilter !== "All Changes") {
         const actionLower = row.action.toLowerCase();
         const map: Record<string, string[]> = {
           "Rate Changes": ["rate"],
-          "Financial": ["bill", "bonus", "deduction"],
-          "Collection": ["milk"],
-          "Farmer": ["farmer"],
-          "System": ["authentication", "user", "profile"],
+          Financial: ["bill", "bonus", "deduction"],
+          Collection: ["milk"],
+          Farmer: ["farmer"],
+          System: ["auth", "user"],
         };
+
         const keywords = map[typeFilter] || [];
-        if (!keywords.some((keyword) => actionLower.includes(keyword))) {
-          return false;
-        }
+        if (!keywords.some((k) => actionLower.includes(k))) return false;
       }
+
       if (dateFilter) {
         const parsed = new Date(row.timestamp);
         if (!Number.isNaN(parsed.getTime())) {
@@ -49,16 +85,21 @@ const AuditLogPage: React.FC = () => {
           if (iso !== dateFilter) return false;
         }
       }
+
       return true;
     });
-  }, [auditRows, dateFilter, typeFilter]);
+  }, [logs, dateFilter, typeFilter]); // ✅ FIXED
 
   useEffect(() => {
     setCurrentPage(1);
   }, [typeFilter, dateFilter]);
 
   const totalPages = Math.ceil(filteredRows.length / itemsPerPage) || 1;
-  const paginatedRows = filteredRows.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
+
+  const paginatedRows = filteredRows.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
 
   const severityBadge = (severity: AuditLog["severity"]) => {
     const styles: Record<AuditLog["severity"], string> = {
@@ -115,7 +156,7 @@ const AuditLogPage: React.FC = () => {
         </div>
       </div>
 
-      <div className={`card p-5 bg-white rounded-lg shadow-sm border border-slate-200 transition-opacity ${isLoading ? 'opacity-50 pointer-events-none' : ''}`}>
+      <div className={`card p-5 bg-white rounded-lg shadow-sm border border-slate-200 transition-opacity ${loading ? 'opacity-50 pointer-events-none' : ''}`}>
         <table className="w-full">
           <thead>
             <tr className="border-b border-slate-200">
@@ -129,7 +170,7 @@ const AuditLogPage: React.FC = () => {
             </tr>
           </thead>
           <tbody>
-            {isLoading && auditRows.length === 0 ? (
+            {loading && logs.length === 0 ? (
               <tr>
                 <td colSpan={7} className="py-8 text-center text-slate-500 animate-pulse">
                   Loading audit logs...

@@ -83,16 +83,17 @@ const SuperAdminCentersPage: React.FC = () => {
                   <p className="text-sm text-gray-500">{location}</p>
 
                   {/* DETAILS */}
-                  <div className="mt-3 text-sm">
-                    <p><b>Owner:</b> {center.ownerName}</p>
-                    <p><b>Mobile:</b> {center.mobile}</p>
-                    <p><b>Milk:</b> {center.milkType}</p>
+                  <div className="grid grid-cols-2 gap-3">
+                    <StatItem label="Total Milk" value={`${center.totalMilk} L`} />
+                    <StatItem label="Avg FAT" value={center.avgFat} />
+                    <StatItem label="Avg SNF" value={center.avgSnf} />
+                    <StatItem label="Tank vs Farmer" value={`${center.tankFat} / ${center.avgFat}`} />
                   </div>
 
                   {/* ACTIONS */}
                   <div className="mt-4 flex gap-2">
                     <button
-                      onClick={() => navigate(`/centers/${center._id}`)}
+                      onClick={() => navigate(`/centers/edit/${center._id}`)}
                       className="border px-3 py-1 rounded"
                     >
                       Edit
@@ -115,5 +116,12 @@ const SuperAdminCentersPage: React.FC = () => {
     </div>
   );
 };
+
+const StatItem = ({ label, value }: any) => (
+  <div className="bg-background-muted rounded-lg p-3">
+    <p className="text-xs text-text-secondary">{label}</p>
+    <p className="text-sm font-semibold text-text-primary">{value}</p>
+  </div>
+);
 
 export default SuperAdminCentersPage;

@@ -15,14 +15,13 @@ initializeDatabase().then(() => {
   ReactDOM.createRoot(
     document.getElementById("root") as HTMLElement
   ).render(
-    <React.StrictMode>
-      <AppProvider>
-        <CenterProvider>
-          <BrowserRouter>
-            <App />
-          </BrowserRouter>
-        </CenterProvider>
-      </AppProvider>
-    </React.StrictMode>
+    <AppProvider>
+      <CenterProvider>
+        <BrowserRouter>
+          <App />
+        </BrowserRouter>
+      </CenterProvider>
+    </AppProvider>
+
   );
 });

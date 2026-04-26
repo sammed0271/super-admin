@@ -4,7 +4,7 @@ const rateChartHistorySchema = new mongoose.Schema(
   {
     centerId: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "CollectionCenter",
+      ref: "Center",
       required: true
     },
     milkType: { type: String, enum: ["cow", "buffalo", "mix"], required: true },

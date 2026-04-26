@@ -134,75 +134,132 @@ const generateRatesFromRange = (
  */
 export const getRateCharts = async (req, res) => {
   try {
-    let cow = await RateChart.findOne({ milkType: "cow" }).sort({
-      effectiveFrom: -1,
-    });
+    const { centerId } = req.query;
 
-    let buffalo = await RateChart.findOne({ milkType: "buffalo" }).sort({
-      effectiveFrom: -1,
-    });
+    if (!centerId) {
+      return res.status(400).json({ message: "centerId required" });
+    }
+
+    let cow = await RateChart.findOne({ milkType: "cow", centerId });
 
     if (!cow) {
-      cow = await RateChart.create(defaultRateChart("cow"));
+      cow = await RateChart.create({
+        ...defaultRateChart("cow"),
+        centerId,
+      });
     }
+
+    let buffalo = await RateChart.findOne({ milkType: "buffalo", centerId });
 
     if (!buffalo) {
-      buffalo = await RateChart.create(defaultRateChart("buffalo"));
+      buffalo = await RateChart.create({
+        ...defaultRateChart("buffalo"),
+        centerId,
+      });
     }
-    let mix = await RateChart.findOne({ milkType: "mix" }).sort({
-      effectiveFrom: -1,
-    });
+
+    let mix = await RateChart.findOne({ milkType: "mix", centerId });
 
     if (!mix) {
-      mix = await RateChart.create(defaultRateChart("mix"));
+      mix = await RateChart.create({
+        ...defaultRateChart("mix"),
+        centerId,
+      });
     }
 
-    const clean = (doc) => (doc.toObject ? doc.toObject() : doc);
-
     res.json({
-      cow: clean(cow),
-      buffalo: clean(buffalo),
-      mix: clean(mix),
+      cow,
+      buffalo,
+      mix,
     });
-
-    // res.json({ cow, buffalo, mix });
   } catch (err) {
-    console.error("RateChart error:", err);
+    console.error(err);
     res.status(500).json({ message: "Failed to fetch rate charts" });
   }
 };
+// export const getRateCharts = async (req, res) => {
+//   try {
+//     let cow = await RateChart.findOne({ milkType: "cow" }).sort({
+//       effectiveFrom: -1,
+//     });
+
+//     let buffalo = await RateChart.findOne({ milkType: "buffalo" }).sort({
+//       effectiveFrom: -1,
+//     });
+
+//     if (!cow) {
+//       cow = await RateChart.create(defaultRateChart("cow"));
+//     }
+
+//     if (!buffalo) {
+//       buffalo = await RateChart.create(defaultRateChart("buffalo"));
+//     }
+//     let mix = await RateChart.findOne({ milkType: "mix" }).sort({
+//       effectiveFrom: -1,
+//     });
+
+//     if (!mix) {
+//       mix = await RateChart.create(defaultRateChart("mix"));
+//     }
+
+//     const clean = (doc) => (doc.toObject ? doc.toObject() : doc);
+
+//     res.json({
+//       cow: clean(cow),
+//       buffalo: clean(buffalo),
+//       mix: clean(mix),
+//     });
+
+//     // res.json({ cow, buffalo, mix });
+//   } catch (err) {
+//     console.error("RateChart error:", err);
+//     res.status(500).json({ message: "Failed to fetch rate charts" });
+//   }
+// };
 
 /**
  * PUT /rate-chart/:milkType
  * Update Cow or Buffalo chart
  */
-
 export const updateRateChart = async (req, res) => {
   try {
     const { milkType } = req.params;
+    const { centerId } = req.body;
 
-    if (!["cow", "buffalo", "mix"].includes(milkType)) {
-      return res.status(400).json({ message: "Invalid milk type" });
+    if (!centerId) {
+      return res.status(400).json({ message: "centerId required" });
     }
 
     const effectiveFrom =
       req.body.effectiveFrom || new Date().toISOString().slice(0, 10);
 
-    // ✅ REMOVE _id BEFORE SAVING HISTORY
-    const { _id, ...historyData } = req.body;
+    const { _id, ...data } = req.body;
 
+    // ✅ Save history
     await RateChartHistory.create({
-      ...historyData,
+      ...data,
+      centerId,
       milkType,
       effectiveFrom,
-      savedBy: req.user?._id || null,
-      createdAt: new Date(),
+      savedBy: req.user?.id || null,
+    });
+    await AuditLog.create({
+      action: "UPDATE_RATE_CHART",
+      userId: req.user.id,
+      userRole: req.user.role,
+      entity: "RateChart",
+      entityId: chart._id,
+      details: {
+        milkType: chart.milkType,
+      },
     });
 
+    // ✅ Update main chart
     const updated = await RateChart.findOneAndUpdate(
-      { milkType },
+      { centerId, milkType },
       {
-        ...historyData,
+        ...data,
+        centerId,
         milkType,
         effectiveFrom,
         updatedAt: new Date().toISOString(),
@@ -210,27 +267,71 @@ export const updateRateChart = async (req, res) => {
       {
         new: true,
         upsert: true,
-        runValidators: true,
-      },
+      }
     );
 
     res.json(updated);
   } catch (err) {
-    console.error("Rate chart update failed:", err);
+    console.error(err);
     res.status(500).json({ message: err.message });
   }
 };
+// export const updateRateChart = async (req, res) => {
+//   try {
+//     const { milkType } = req.params;
+
+//     if (!["cow", "buffalo", "mix"].includes(milkType)) {
+//       return res.status(400).json({ message: "Invalid milk type" });
+//     }
+
+//     const effectiveFrom =
+//       req.body.effectiveFrom || new Date().toISOString().slice(0, 10);
+
+//     // ✅ REMOVE _id BEFORE SAVING HISTORY
+//     const { _id, ...historyData } = req.body;
+
+//     await RateChartHistory.create({
+//       ...historyData,
+//       milkType,
+//       effectiveFrom,
+//       savedBy: req.user?._id || null,
+//       createdAt: new Date(),
+//     });
+
+//     const updated = await RateChart.findOneAndUpdate(
+//       { milkType },
+//       {
+//         ...historyData,
+//         milkType,
+//         effectiveFrom,
+//         updatedAt: new Date().toISOString(),
+//       },
+//       {
+//         new: true,
+//         upsert: true,
+//         runValidators: true,
+//       },
+//     );
+
+//     res.json(updated);
+//   } catch (err) {
+//     console.error("Rate chart update failed:", err);
+//     res.status(500).json({ message: err.message });
+//   }
+// };
+
 
 export const getRateForMilk = async (req, res) => {
   try {
-    const { milkType, fat, snf, date } = req.query;
+    const { milkType, fat, snf, date, centerId } = req.query;
 
-    if (!milkType || !fat || !snf || !date) {
-      return res.status(400).json({ message: "Missing parameters" });
+    if (!centerId) {
+      return res.status(400).json({ message: "centerId required" });
     }
 
     const chart = await RateChart.findOne({
       milkType,
+      centerId,
       effectiveFrom: { $lte: date },
     }).sort({ effectiveFrom: -1 });
 
@@ -238,19 +339,46 @@ export const getRateForMilk = async (req, res) => {
       return res.status(404).json({ message: "Rate chart not found" });
     }
 
-    const fatValue = Number(fat);
-    const snfValue = Number(snf);
+    const fatIndex = chart.fats.indexOf(Number(fat));
+    const snfIndex = chart.snfs.indexOf(Number(snf));
 
-    const fatAmount = calculateFatAmount(fatValue, chart.fatSlabs);
-    const snfAmount = calculateSnfAmount(snfValue, chart.snfSlabs);
+    const rate = chart.rates[fatIndex][snfIndex];
 
-    const rate = chart.baseRate + fatAmount + snfAmount;
-    res.json({ rate: +rate.toFixed(2) });
+    res.json({ rate });
   } catch (err) {
-    console.error(err);
     res.status(500).json({ message: err.message });
   }
 };
+// export const getRateForMilk = async (req, res) => {
+//   try {
+//     const { milkType, fat, snf, date } = req.query;
+
+//     if (!milkType || !fat || !snf || !date) {
+//       return res.status(400).json({ message: "Missing parameters" });
+//     }
+
+//     const chart = await RateChart.findOne({
+//       milkType,
+//       effectiveFrom: { $lte: date },
+//     }).sort({ effectiveFrom: -1 });
+
+//     if (!chart) {
+//       return res.status(404).json({ message: "Rate chart not found" });
+//     }
+
+//     const fatValue = Number(fat);
+//     const snfValue = Number(snf);
+
+//     const fatAmount = calculateFatAmount(fatValue, chart.fatSlabs);
+//     const snfAmount = calculateSnfAmount(snfValue, chart.snfSlabs);
+
+//     const rate = chart.baseRate + fatAmount + snfAmount;
+//     res.json({ rate: +rate.toFixed(2) });
+//   } catch (err) {
+//     console.error(err);
+//     res.status(500).json({ message: err.message });
+//   }
+// };
 
 const defaultFatSlabs = [
   { from: 3, to: 4, rate: 0.1 },

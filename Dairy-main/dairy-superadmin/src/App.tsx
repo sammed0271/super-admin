@@ -5,7 +5,8 @@ import MainLayout from "./layout/mainLayout";
 import Dashboard from "./pages/dashboard/dashboard";
 import Centers from "./pages/centers/centers";
 import AddCenter from "./pages/centers/addCenter";
-import CenterDetails from "./pages/centers/centerDetails";
+// import CenterDetails from "./pages/centers/centerDetails";
+import CenterEdit from "./pages/centers/centerEdit";
 import RateChart from "./pages/rate-chart/rate-chart";
 import AuditLog from "./pages/audit/audit";
 import Quality from "./pages/quality/quality";
@@ -52,7 +53,7 @@ const App: React.FC = () => {
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/centers" element={<Centers />} />
         <Route path="/centers/add" element={<AddCenter />} />
-        <Route path="/centers/:id" element={<CenterDetails />} />
+        <Route path="/centers/edit/:id" element={<CenterEdit />} />
         <Route path="/rate-chart" element={<RateChart />} />
         <Route path="/audit" element={<AuditLog />} />
         <Route path="/quality" element={<Quality />} />

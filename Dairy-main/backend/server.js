@@ -19,6 +19,8 @@ import rateChartRoutes from "./routes/rateChart_routes.js";
 import reportRoutes from "./routes/report_routes.js";
 import inventoryTransactionRoutes from "./routes/inventory_transaction_routes.js";
 
+import auditRoutes from "./routes/audit_routes.js";
+
 import paymentRoutes from "./routes/paymentRoutes.js";
 const app = express();
 
@@ -65,6 +67,7 @@ app.use("/api/inventory-transactions", inventoryTransactionRoutes);
 app.use("/api/payments", paymentRoutes);
 
 app.use("/api/centers", centerRoutes);
+app.use("/api/audit", auditRoutes);
 const PORT = process.env.PORT;
 
 app.listen(PORT, () => {

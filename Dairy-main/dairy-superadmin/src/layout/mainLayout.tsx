@@ -2,21 +2,34 @@
 import React from "react";
 import { Outlet } from "react-router-dom";
 import Sidebar from "./sidebar";
+import { useState } from "react";
 // import Navbar from "./navbar";
 
 const MainLayout: React.FC = () => {
+  const [open, setOpen] = useState(false);
   return (
-    <div className="flex h-screen bg-[#F8F4E3]">
-      {/* Left: sidebar */}
-      <Sidebar />
+    <div className="flex h-screen overflow-hidden">
+      {/* Sidebar */}
+      <Sidebar isOpen={open} onClose={() => setOpen(false)} />
 
+      <div className="flex-1 flex flex-col w-full">
 
-      {/* Right: navbar + page content */}
-      <div className="flex flex-1 flex-col">
-        {/* <Navbar /> */}
-        <main className="flex-1 overflow-hidden">
+        {/* Topbar */}
+        <div className="p-3 border-b flex items-center justify-between">
+          <button
+            className="md:hidden"
+            onClick={() => setOpen(true)}
+          >
+            ☰
+          </button>
+
+          <h1 className="font-semibold">Superadmin</h1>
+        </div>
+
+        {/* Page */}
+        <div className="p-4 overflow-auto">
           <Outlet />
-        </main>
+        </div>
       </div>
     </div>
   );

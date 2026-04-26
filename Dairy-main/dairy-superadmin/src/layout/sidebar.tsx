@@ -2,6 +2,11 @@
 import React from "react";
 import { NavLink } from "react-router-dom";
 
+type Props = {
+  isOpen: boolean;
+  onClose: () => void;
+};
+
 type MenuItem = {
   label: string;
   path: string;
@@ -117,7 +122,7 @@ const SettingsIcon = () => (
   </svg>
 );
 
-const SuperAdminSidebar: React.FC = () => {
+const SuperAdminSidebar: React.FC<Props> = ({ isOpen, onClose }) => {
   const menu: MenuItem[] = [
     { label: "Dashboard", path: "/dashboard", icon: <DashboardIcon /> },
     {
@@ -144,37 +149,72 @@ const SuperAdminSidebar: React.FC = () => {
   ];
 
   return (
-    <aside className="flex h-full min-h-screen w-64 flex-col border-r border-slate-200 bg-white">
-      {/* Logo */}
-      <div className="border-b border-slate-100 p-5">
-        <div className="flex items-center gap-3">
-          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-green-500 to-emerald-600 text-white">
-            <svg
-              className="h-6 w-6"
-              viewBox="0 0 24 24"
-              fill="currentColor"
-            >
-              <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" />
-            </svg>
-          </div>
-          <div>
-            <h1 className="text-sm font-bold text-slate-800">
-              DairyPro Enterprise
-            </h1>
-            <p className="text-xs text-slate-500">Management System</p>
-          </div>
-        </div>
-      </div>
 
-      {/* Navigation */}
-      <nav className="flex-1 overflow-y-auto py-4">
-        <div className="px-3 pb-2 text-xs font-semibold uppercase tracking-wider text-slate-400">
-          Main Menu
+    <>
+      {/* Overlay */}
+      {isOpen && (
+        <div
+          className="fixed inset-0 bg-black/40 z-30 md:hidden"
+          onClick={onClose}
+        />
+      )}
+
+      <aside
+        className={`
+      fixed top-0 left-0 z-40 h-full w-64 bg-white border-r border-slate-200
+      transform transition-transform duration-300
+
+      ${isOpen ? "translate-x-0" : "-translate-x-full"}
+      md:translate-x-0 md:static
+    `}
+      >
+        {/* Logo */}
+        <div className="border-b border-slate-100 p-5">
+          <div className="flex items-center gap-3">
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-green-500 to-emerald-600 text-white">
+              <svg
+                className="h-6 w-6"
+                viewBox="0 0 24 24"
+                fill="currentColor"
+              >
+                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" />
+              </svg>
+            </div>
+            <div>
+              <h1 className="text-sm font-bold text-slate-800">
+                DairyPro Enterprise
+              </h1>
+              <p className="text-xs text-slate-500">Management System</p>
+            </div>
+          </div>
         </div>
-        {menu.map((item) => (
+
+        {/* Navigation */}
+        <nav className="flex-1 overflow-y-auto py-4">
+          <div className="px-3 pb-2 text-xs font-semibold uppercase tracking-wider text-slate-400">
+            Main Menu
+          </div>
+          {menu.map((item) => (
+            <NavLink
+              key={item.path}
+              to={item.path}
+              onClick={onClose}
+              className={({ isActive }) =>
+                [
+                  "sidebar-item flex w-full items-center gap-3 px-4 py-3 text-sm font-medium text-slate-700",
+                  isActive ? "active" : "",
+                ].join(" ")
+              }
+            >
+              <span className="text-slate-500">{item.icon}</span>
+              <span>{item.label}</span>
+            </NavLink>
+          ))}
+          <div className="px-3 pt-6 pb-2 text-xs font-semibold uppercase tracking-wider text-slate-400">
+            System
+          </div>
           <NavLink
-            key={item.path}
-            to={item.path}
+            to="/settings"
             className={({ isActive }) =>
               [
                 "sidebar-item flex w-full items-center gap-3 px-4 py-3 text-sm font-medium text-slate-700",
@@ -182,56 +222,41 @@ const SuperAdminSidebar: React.FC = () => {
               ].join(" ")
             }
           >
-            <span className="text-slate-500">{item.icon}</span>
-            <span>{item.label}</span>
+            <span className="text-slate-500">
+              <SettingsIcon />
+            </span>
+            <span>Settings</span>
           </NavLink>
-        ))}
-        <div className="px-3 pt-6 pb-2 text-xs font-semibold uppercase tracking-wider text-slate-400">
-          System
-        </div>
-        <NavLink
-          to="/settings"
-          className={({ isActive }) =>
-            [
-              "sidebar-item flex w-full items-center gap-3 px-4 py-3 text-sm font-medium text-slate-700",
-              isActive ? "active" : "",
-            ].join(" ")
-          }
-        >
-          <span className="text-slate-500">
-            <SettingsIcon />
-          </span>
-          <span>Settings</span>
-        </NavLink>
-      </nav>
+        </nav>
 
-      {/* User Profile */}
-      <div className="border-t border-slate-100 p-4">
-        <div className="flex items-center gap-3">
-          <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-blue-500 to-blue-600 text-sm font-semibold text-white">
-            RS
+        {/* User Profile */}
+        <div className="border-t border-slate-100 p-4">
+          <div className="flex items-center gap-3">
+            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-blue-500 to-blue-600 text-sm font-semibold text-white">
+              RS
+            </div>
+            <div className="min-w-0 flex-1">
+              <p className="truncate text-sm font-semibold text-slate-800">
+                Rajesh Sharma
+              </p>
+              <p className="text-xs text-slate-500">Super Admin</p>
+            </div>
+            <button className="rounded-lg p-2 transition hover:bg-slate-100">
+              <svg
+                className="h-4 w-4 text-slate-400"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                strokeWidth="2"
+                fill="none"
+              >
+                <path d="M17 16l4-4m0 0l-4-4m4 4H7" />
+                <path d="M13 20v1a3 3 0 0 1-3 3H6a3 3 0 0 1-3-3V7a3 3 0 0 1 3-3h4a3 3 0 0 1 3 3v1" />
+              </svg>
+            </button>
           </div>
-          <div className="min-w-0 flex-1">
-            <p className="truncate text-sm font-semibold text-slate-800">
-              Rajesh Sharma
-            </p>
-            <p className="text-xs text-slate-500">Super Admin</p>
-          </div>
-          <button className="rounded-lg p-2 transition hover:bg-slate-100">
-            <svg
-              className="h-4 w-4 text-slate-400"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-              strokeWidth="2"
-              fill="none"
-            >
-              <path d="M17 16l4-4m0 0l-4-4m4 4H7" />
-              <path d="M13 20v1a3 3 0 0 1-3 3H6a3 3 0 0 1-3-3V7a3 3 0 0 1 3-3h4a3 3 0 0 1 3 3v1" />
-            </svg>
-          </button>
         </div>
-      </div>
-    </aside>
+      </aside>
+    </>
   );
 };
 
