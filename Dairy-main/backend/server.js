@@ -32,22 +32,24 @@ app.use(
     origin: (origin, callback) => {
       if (!origin) return callback(null, true);
 
-      const allowedOrigins = [
-        "https://sammed0271-super-admin-7bk736wy6.vercel.app",
-        "https://sammed0271-super-admin.vercel.app",
-        "https://dairy-eo1r.vercel.app",
-        "http://localhost:5173",
-      ];
-
-      if (allowedOrigins.includes(origin)) {
-        callback(null, true);
-      } else {
-        callback(new Error("Not allowed by CORS"));
+      // allow all vercel + localhost
+      if (
+        origin.includes("vercel.app") ||
+        origin.includes("localhost")
+      ) {
+        return callback(null, true);
       }
+
+      console.log("❌ Blocked:", origin);
+
+      return callback(null, false); // ✅ DO NOT throw error
     },
     credentials: true,
-  }),
+  })
 );
+
+// 🔥 VERY IMPORTANT
+app.options("*", cors());
 
 connectDB();
 
