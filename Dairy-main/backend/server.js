@@ -33,8 +33,7 @@ app.use(
       if (!origin) return callback(null, true);
 
       const allowedOrigins = [
-        "*",
-        "https://https://sammed0271-super-admin-7bk736wy6.vercel.app/",
+        "https://sammed0271-super-admin-7bk736wy6.vercel.app",
         "https://sammed0271-super-admin.vercel.app",
         "https://dairy-eo1r.vercel.app",
         "http://localhost:5173",
