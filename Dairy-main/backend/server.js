@@ -34,6 +34,7 @@ app.use(
 
       const allowedOrigins = [
         "*",
+        "https://sammed0271-super-admin.vercel.app",
         "https://dairy-eo1r.vercel.app",
         "http://localhost:5173",
       ];
