@@ -27,29 +27,22 @@ const app = express();
 app.use(express.json());
 app.use(cookieParser());
 
-app.use(
-  cors({
-    origin: (origin, callback) => {
-      if (!origin) return callback(null, true);
+app.use(cors({
+  origin: (origin, callback) => {
+    if (!origin) return callback(null, true);
 
-      // allow all vercel + localhost
-      if (
-        origin.includes("vercel.app") ||
-        origin.includes("localhost")
-      ) {
-        return callback(null, true);
-      }
+    if (
+      origin.includes("vercel.app") ||
+      origin.includes("localhost")
+    ) {
+      return callback(null, true);
+    }
 
-      console.log("❌ Blocked:", origin);
-
-      return callback(null, false); // ✅ DO NOT throw error
-    },
-    credentials: true,
-  })
-);
-
-// 🔥 VERY IMPORTANT
-app.options("*", cors());
+    console.log("Blocked:", origin);
+    return callback(null, false);
+  },
+  credentials: true
+}));
 
 connectDB();
 
