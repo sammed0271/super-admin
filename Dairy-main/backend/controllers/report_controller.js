@@ -7,9 +7,21 @@ import Inventory from "../models/Inventory.js";
 ================================ */
 export const dailyMilkReport = async (req, res) => {
   try {
-    const { date } = req.query;
+    const { date, centerId } = req.query;
 
-    const entries = await Milk.find({ date })
+    if (!centerId && req.user.role !== "superadmin") {
+      return res.status(400).json({ message: "centerId required" });
+    }
+
+    const filter = { date };
+
+    if (centerId) {
+      filter.centerId = centerId;
+    } else if (req.user.role !== "superadmin") {
+      filter.centerId = req.centerId;
+    }
+
+    const entries = await Milk.find(filter)
       .populate("farmerId", "name mobile")
       .sort({ shift: 1 });
 
