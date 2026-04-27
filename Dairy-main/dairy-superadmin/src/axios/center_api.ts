@@ -39,3 +39,8 @@ export const getCenterAnalytics = async (centerId: string) => {
   const res = await api.get(`/center/${centerId}/analytics`);
   return res.data;
 };
+
+export const getCenterFullDetails = async (centerId: string) => {
+  const res = await api.get(`/centers/${centerId}/full`);
+  return res.data;
+};

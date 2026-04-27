@@ -147,6 +147,7 @@ const CenterEditPage: React.FC = () => {
       await updateCenter(center._id, payload);
 
       setSuccess("Center updated successfully");
+      navigate("/centers");
 
     } catch {
       setError("Update failed");

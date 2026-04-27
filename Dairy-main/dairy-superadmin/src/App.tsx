@@ -14,6 +14,7 @@ import Reports from "./pages/reports/reports";
 import Settings from "./pages/settings/settings";
 import Login from "./pages/login/login";
 import NotFound from "./pages/NotFound";
+import CenterDetails from "./pages/centers/centerDetails";
 
 
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
@@ -54,6 +55,7 @@ const App: React.FC = () => {
         <Route path="/centers" element={<Centers />} />
         <Route path="/centers/add" element={<AddCenter />} />
         <Route path="/centers/edit/:id" element={<CenterEdit />} />
+        <Route path="/centers/details/:id" element={<CenterDetails />} />
         <Route path="/rate-chart" element={<RateChart />} />
         <Route path="/audit" element={<AuditLog />} />
         <Route path="/quality" element={<Quality />} />

@@ -1,5 +1,7 @@
 import Center from "../models/Center.js";
 import User from "../models/User.js";
+import farmer from "../models/Farmer.js";
+import Milk from "../models/Milk.js";
 import bcrypt from "bcrypt";
 import AuditLog from "../models/AuditLog.js";
 
@@ -314,6 +316,51 @@ export const getCenterAnalytics = async (req, res) => {
       farmers: data,
     });
   } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
+
+export const getCenterFullDetails = async (req, res) => {
+  try {
+    const { centerId } = req.params;
+
+    // 1️⃣ Center
+    const center = await Center.findById(centerId);
+    if (!center) {
+      return res.status(404).json({ message: "Center not found" });
+    }
+
+    // 2️⃣ Farmers
+    const farmers = await farmer.find({ centerId });
+
+    // 3️⃣ Milk Data
+    const milk = await Milk.find({ centerId })
+      .sort({ date: -1 })
+      .limit(50)
+      .populate("farmerId", "name");
+
+    // 4️⃣ Summary
+    const totalMilk = milk.reduce((s, m) => s + m.quantity, 0);
+    const avgFat =
+      milk.reduce((s, m) => s + m.fat, 0) / (milk.length || 1);
+    const avgSnf =
+      milk.reduce((s, m) => s + m.snf, 0) / (milk.length || 1);
+
+    res.json({
+      center,
+      farmers,
+      milk,
+      summary: {
+        totalMilk,
+        avgFat,
+        avgSnf,
+        farmersCount: farmers.length,
+      },
+    });
+
+  } catch (err) {
+    console.error("Center full details error:", err);
     res.status(500).json({ message: err.message });
   }
 };

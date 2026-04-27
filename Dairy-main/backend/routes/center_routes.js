@@ -5,6 +5,7 @@ import {
   getCenterById,
   updateCenter,
   toggleCenterStatus,
+  getCenterFullDetails,
 } from "../controllers/center_controller.js";
 
 import { protect } from "../middleware/auth_middleware.js";
@@ -17,5 +18,6 @@ router.get("/", protect, getCenters);
 router.get("/:id", protect, getCenterById);
 router.put("/:id", protect, updateCenter);
 router.patch("/:id/toggle", protect, toggleCenterStatus);
+router.get("/:centerId/full", protect, getCenterFullDetails);
 
 export default router;

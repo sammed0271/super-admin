@@ -33,29 +33,39 @@ const SuperAdminCentersPage: React.FC = () => {
   };
 
   return (
-    <div className="h-full w-full overflow-auto bg-slate-50 p-6">
-      <div className="mx-auto flex max-w-6xl flex-col gap-6">
 
-        {/* HEADER (UNCHANGED) */}
+    <div className="h-full w-full overflow-auto bg-slate-50 p-6">
+      <div className="mx-auto max-w-6xl flex flex-col gap-6">
+
+        {/* HEADER */}
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
-            <h1 className="text-2xl font-bold text-slate-800">Collection Centers</h1>
-            <p className="text-sm text-slate-500">
+            <h1 className="text-2xl font-bold text-slate-800">
+              Collection Centers
+            </h1>
+            <p className="text-sm text-slate-500 mt-1">
               Manage and monitor all your dairy collection points
             </p>
           </div>
 
           <button
             onClick={() => navigate("/centers/add")}
-            className="flex items-center gap-2 rounded-xl bg-gradient-to-r from-green-600 to-emerald-600 px-5 py-2.5 text-sm font-semibold text-white shadow-lg"
+            className="flex items-center gap-2 rounded-xl bg-gradient-to-r from-green-600 to-emerald-600 px-5 py-2.5 text-sm font-semibold text-white shadow-md hover:shadow-lg transition"
           >
-            Add New Center
+            + Add New Center
           </button>
         </div>
 
         {/* STATES */}
-        {isLoading && <div>Loading...</div>}
-        {error && <div className="text-red-500">{error}</div>}
+        {isLoading && (
+          <div className="text-center py-10 text-slate-500">Loading...</div>
+        )}
+
+        {error && (
+          <div className="text-red-500 bg-red-50 border border-red-200 p-3 rounded-lg">
+            {error}
+          </div>
+        )}
 
         {/* LIST */}
         {!isLoading && centers.length > 0 && (
@@ -63,48 +73,69 @@ const SuperAdminCentersPage: React.FC = () => {
             {centers.map((center) => {
 
               const location = `${center.village}, ${center.district}, ${center.state}`;
+
               const badgeClass =
                 center.status === "Active"
                   ? "bg-green-100 text-green-700"
                   : "bg-amber-100 text-amber-700";
 
               return (
-                <div key={center._id} className="rounded-2xl bg-white p-5 shadow-sm">
+                <div
+                  key={center._id}
+                  className="rounded-2xl bg-white p-5 shadow-sm border border-slate-200 hover:shadow-md transition flex flex-col gap-4"
+                >
 
                   {/* HEADER */}
-                  <div className="flex justify-between">
-                    <h2 className="font-bold">{center.name}</h2>
+                  <div className="flex justify-between items-start">
+                    <div>
+                      <h2 className="font-semibold text-slate-800 text-lg">
+                        {center.name}
+                      </h2>
+                      <p className="text-sm text-slate-500">{location}</p>
+                    </div>
 
-                    <span className={`px-3 py-1 text-xs rounded-full ${badgeClass}`}>
+                    <span
+                      className={`px-3 py-1 text-xs rounded-full font-medium ${badgeClass}`}
+                    >
                       {center.status}
                     </span>
                   </div>
 
-                  <p className="text-sm text-gray-500">{location}</p>
-
-                  {/* DETAILS */}
-                  <div className="grid grid-cols-2 gap-3">
+                  {/* STATS */}
+                  <div className="grid grid-cols-2 gap-4">
                     <StatItem label="Total Milk" value={`${center.totalMilk} L`} />
                     <StatItem label="Avg FAT" value={center.avgFat} />
                     <StatItem label="Avg SNF" value={center.avgSnf} />
-                    <StatItem label="Tank vs Farmer" value={`${center.tankFat} / ${center.avgFat}`} />
+                    <StatItem
+                      label="Tank vs Farmer"
+                      value={`${center.tankFat} / ${center.avgFat}`}
+                    />
                   </div>
 
                   {/* ACTIONS */}
-                  <div className="mt-4 flex gap-2">
+                  <div className="flex flex-wrap gap-2 pt-2 border-t border-slate-100">
+
+                    <button
+                      onClick={() => navigate(`/centers/details/${center._id}`)}
+                      className="px-3 py-1.5 text-sm rounded-lg bg-slate-100 hover:bg-slate-200 transition"
+                    >
+                      View Details
+                    </button>
+
                     <button
                       onClick={() => navigate(`/centers/edit/${center._id}`)}
-                      className="border px-3 py-1 rounded"
+                      className="px-3 py-1.5 text-sm rounded-lg border border-slate-300 hover:bg-slate-100 transition"
                     >
                       Edit
                     </button>
 
                     <button
                       onClick={() => handleToggle(center._id)}
-                      className="border px-3 py-1 rounded text-red-600"
+                      className="px-3 py-1.5 text-sm rounded-lg border border-red-300 text-red-600 hover:bg-red-50 transition"
                     >
                       Toggle Status
                     </button>
+
                   </div>
 
                 </div>
@@ -114,6 +145,8 @@ const SuperAdminCentersPage: React.FC = () => {
         )}
       </div>
     </div>
+
+
   );
 };
 
