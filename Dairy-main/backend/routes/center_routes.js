@@ -13,11 +13,11 @@ import { protect } from "../middleware/auth_middleware.js";
 const router = express.Router();
 
 // 🔐 Superadmin routes
-router.post("/", protect, createCenter);
-router.get("/", protect, getCenters);
-router.get("/:id", protect, getCenterById);
-router.put("/:id", protect, updateCenter);
-router.patch("/:id/toggle", protect, toggleCenterStatus);
-router.get("/:centerId/full", protect, getCenterFullDetails);
+router.post("/", createCenter);
+router.get("/", getCenters);
+router.get("/:id", getCenterById);
+router.put("/:id",, updateCenter);
+router.patch("/:id/toggle", toggleCenterStatus);
+router.get("/:centerId/full", getCenterFullDetails);
 
 export default router;

@@ -46,9 +46,9 @@ const App: React.FC = () => {
       {/* protected */}
       <Route
         element={
-          <ProtectedRoute>
-            <MainLayout />
-          </ProtectedRoute>
+
+          <MainLayout />
+
         }
       >
         <Route path="/dashboard" element={<Dashboard />} />
