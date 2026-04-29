@@ -16,7 +16,7 @@ const router = express.Router();
 router.post("/", createCenter);
 router.get("/", getCenters);
 router.get("/:id", getCenterById);
-router.put("/:id",, updateCenter);
+router.put("/:id", updateCenter);
 router.patch("/:id/toggle", toggleCenterStatus);
 router.get("/:centerId/full", getCenterFullDetails);
 

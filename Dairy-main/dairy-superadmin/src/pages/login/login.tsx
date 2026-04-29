@@ -52,22 +52,22 @@ const Login = () => {
         >
           Login
         </button>
-        <br>
+        <br></br>
 
-          <button
-            onClick={() => {
-              const demoEmail = "admin@test.com";
-              const demoPassword = "123456";
+        <button
+          onClick={() => {
+            const demoEmail = "admin@test.com";
+            const demoPassword = "123456";
 
-              setEmail(demoEmail);
-              setPassword(demoPassword);
+            setEmail(demoEmail);
+            setPassword(demoPassword);
 
-              handleLogin();
-            }}
-            className="w-full border border-blue-600 text-blue-600 py-2 rounded-lg hover:bg-blue-50 transition duration-200"
-          >
-            Use Demo Account
-          </button>
+            handleLogin();
+          }}
+          className="w-full border border-blue-600 text-blue-600 py-2 rounded-lg hover:bg-blue-50 transition duration-200"
+        >
+          Use Demo Account
+        </button>
 
       </div>
     </div>

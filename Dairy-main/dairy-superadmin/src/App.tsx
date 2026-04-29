@@ -1,5 +1,5 @@
 import React from "react";
-import { Routes, Route, Navigate, useLocation } from "react-router-dom";
+import { Routes, Route, Navigate } from "react-router-dom";
 
 import MainLayout from "./layout/mainLayout";
 import Dashboard from "./pages/dashboard/dashboard";
@@ -17,22 +17,22 @@ import NotFound from "./pages/NotFound";
 import CenterDetails from "./pages/centers/centerDetails";
 
 
-const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
-  const token = localStorage.getItem("token"); // 🔥 use real token
-  const location = useLocation();
+// const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
+//   const token = localStorage.getItem("token"); // 🔥 use real token
+//   const location = useLocation();
 
-  const user = JSON.parse(localStorage.getItem("user") || "{}");
+//   const user = JSON.parse(localStorage.getItem("user") || "{}");
 
-  if (!token) {
-    return <Navigate to="/login" state={{ from: location }} replace />;
-  }
+//   if (!token) {
+//     return <Navigate to="/login" state={{ from: location }} replace />;
+//   }
 
-  if (user.role !== "superadmin") {
-    return <Navigate to="/login" />;
-  }
+//   if (user.role !== "superadmin") {
+//     return <Navigate to="/login" />;
+//   }
 
-  return <>{children}</>;
-};
+//   return <>{children}</>;
+// };
 
 const App: React.FC = () => {
   return (
